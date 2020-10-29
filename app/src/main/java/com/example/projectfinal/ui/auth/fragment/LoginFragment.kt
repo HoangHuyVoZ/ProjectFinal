@@ -52,7 +52,7 @@ class LoginFragment : Fragment() {
             it.hideKeyboard()
             checkLogin()
         }
-    }
+}
 
     private fun listenLogin() {
         authViewModel.loginData.observe(viewLifecycleOwner, Observer {
@@ -60,7 +60,7 @@ class LoginFragment : Fragment() {
                 if(it.success){
                     val pref: SharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, AppCompatActivity.MODE_PRIVATE)
                     val editor = pref.edit()
-                    editor.putBoolean(FIRST_TIME, false)
+                    editor.putBoolean(FIRST_TIME, true)
                     editor.putString(ACCESS_TOKEN,it.result.accessToken)
                     editor.putString(ROLE,it.result.role)
                     editor.apply()

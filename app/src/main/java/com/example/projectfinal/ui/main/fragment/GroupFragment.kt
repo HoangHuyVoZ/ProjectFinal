@@ -55,6 +55,7 @@ class GroupFragment : Fragment(),ClickItem {
         mainViewModel.groupData.observe(viewLifecycleOwner, Observer {
             if(it!=null){
                 if(it.success){
+                    adapter.clear()
                     adapter.addList(it.result as MutableList<Groupdata>)
                     adapter.notifyDataSetChanged()
                     tv_countGroup.text = "Total: ${it.result.size.toString()} group" ?: "Total: 0 group"
@@ -124,6 +125,7 @@ class GroupFragment : Fragment(),ClickItem {
     private fun getGroup() {
         if (accessToken != null) {
             mainViewModel.getGroup(accessToken)
+
         }
     }
 

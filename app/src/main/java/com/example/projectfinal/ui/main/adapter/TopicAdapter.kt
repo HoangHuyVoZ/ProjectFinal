@@ -20,7 +20,7 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
 
         fun bind(list: TopicData) {
             itemView.item_topic.text = list.name
-            itemView.item_des_top.text =list.description
+            itemView.item_des_top.text = "Description: ${list.description}"
             val pref = itemView.context.getSharedPreferences(
                 PREFS_NAME,
                 AppCompatActivity.MODE_PRIVATE
