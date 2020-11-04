@@ -1,13 +1,11 @@
 package com.example.projectfinal.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectfinal.api.CallApi
 import com.example.projectfinal.model.Signup.Signup
-import com.example.projectfinal.model.User.User
+import com.example.projectfinal.model.user.User
 import com.example.projectfinal.model.login.Login
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -19,11 +17,26 @@ class AuthViewModel : ViewModel() {
     var loginData: MutableLiveData<Login> = MutableLiveData<Login>()
     var signUpData: MutableLiveData<Signup> = MutableLiveData<Signup>()
     var userData: MutableLiveData<User> = MutableLiveData<User>()
+    var userChangPass: MutableLiveData<User> = MutableLiveData<User>()
 
-
-    fun getUserData(accesstoken : String) {
+    fun getUserChangPass(accessToken: String,old:String,new:String,renew:String){
         compositeDisposable.add(
-            apiManager.getUserInfo(accesstoken)
+            apiManager.getUserChangePass(
+                accessToken,old,new,renew)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    userChangPass.value=it
+                },{
+                    userChangPass.value=null
+                })
+
+        )
+
+    }
+    fun getUserData(accessToken : String) {
+        compositeDisposable.add(
+            apiManager.getUserInfo(accessToken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({

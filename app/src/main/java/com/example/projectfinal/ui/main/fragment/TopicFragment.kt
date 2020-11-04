@@ -1,17 +1,17 @@
 package com.example.projectfinal.ui.main.fragment
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +21,6 @@ import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.main.adapter.TopicAdapter
 import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.MainViewModel
-import kotlinx.android.synthetic.main.create_group_dialog.view.*
 import kotlinx.android.synthetic.main.create_topic_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_group.*
 import kotlinx.android.synthetic.main.fragment_topic.*
@@ -30,11 +29,14 @@ import kotlinx.android.synthetic.main.fragment_topic.*
 class TopicFragment : Fragment(), ClickItem {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var layoutManager: LinearLayoutManager
-    lateinit var adapter: TopicAdapter
-    lateinit var accessToken: String
-    var roleGroup = 0
-    var idGroup = ""
-    var idTopic = ""
+    private lateinit var adapter: TopicAdapter
+    private lateinit var accessToken: String
+    private var roleGroup = 0
+    private var idGroup = ""
+    private var idTopic = ""
+    private var role = ""
+    private var nameGroup = ""
+    private lateinit var pref: SharedPreferences
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,33 +46,26 @@ class TopicFragment : Fragment(), ClickItem {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        init()
-        val pref = requireContext().getSharedPreferences(
+        pref = requireContext().getSharedPreferences(
             PREFS_NAME,
             AppCompatActivity.MODE_PRIVATE
         )
-        val role = pref.getString(ROLE, "")
-        val nameGroup = pref.getString(NAME_GROUP, "")
-        tv_Topic.text = nameGroup
-        if (role == MEMBER) {
-            btnAdd_Topic.invisible()
-        } else {
-            btnAdd_Topic.visible()
-        }
+        role = pref.getString(ROLE, "").toString()
+        nameGroup = pref.getString(NAME_GROUP, "").toString()
         accessToken = pref.getString(ACCESS_TOKEN, "").toString()
         idGroup = pref.getString(GROUP_ID, "").toString()
-        tv_token_topic.invisible()
-        progressBar_topic.visible()
-        tv_error_Topic.invisible()
+        init()
         getTopic()
         data()
     }
 
+    @SuppressLint("ShowToast", "SetTextI18n")
     private fun data() {
-        mainViewModel.topicData.observe(viewLifecycleOwner, Observer {
+        mainViewModel.topicData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
-                    tv_countTopic.text = "Total: ${it.result.size.toString()} topic" ?: "Total: 0 topic"
+                    tv_countTopic.text = "Total: ${it.result.size} topic"
+                    adapter.clear()
                     adapter.addList(it.result as MutableList<TopicData>)
                     adapter.notifyDataSetChanged()
                     progressBar_topic.invisible()
@@ -81,17 +76,15 @@ class TopicFragment : Fragment(), ClickItem {
             } else {
                 tv_token_topic.visible()
                 tv_token_topic.setOnClickListener {
-                    val pref: SharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, AppCompatActivity.MODE_PRIVATE)
-                    val editor = pref.edit()
-                    editor.putBoolean(FIRST_TIME, true)
-                    editor.apply()
+                    context?.let { it -> firstTime(it,true) }
                     val intent = Intent(activity, AuthActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }
                 progressBar3.invisible()
             }
         })
-        mainViewModel.createTopicData.observe(viewLifecycleOwner, Observer {
+        mainViewModel.createTopicData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     Toast.makeText(context, "create topic successfully", Toast.LENGTH_SHORT).show()
@@ -103,7 +96,7 @@ class TopicFragment : Fragment(), ClickItem {
             mainViewModel.getTopic(accessToken, idGroup)
             adapter.clear()
         })
-        mainViewModel.updateTopicData.observe(viewLifecycleOwner, Observer {
+        mainViewModel.updateTopicData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     Toast.makeText(context, "update topic successfully", Toast.LENGTH_SHORT).show()
@@ -115,7 +108,7 @@ class TopicFragment : Fragment(), ClickItem {
             mainViewModel.getTopic(accessToken, idGroup)
             adapter.clear()
         })
-        mainViewModel.deleteTopicData.observe(viewLifecycleOwner, Observer {
+        mainViewModel.deleteTopicData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     Toast.makeText(context, "delete topic successfully", Toast.LENGTH_SHORT).show()
@@ -131,12 +124,21 @@ class TopicFragment : Fragment(), ClickItem {
 
 
     private fun getTopic() {
-        if (accessToken != null && idGroup.isNotEmpty()) {
+        if (idGroup.isNotEmpty()) {
             mainViewModel.getTopic(accessToken, idGroup)
         }
     }
 
     private fun init() {
+        tv_Topic.text = nameGroup
+        if (role == MEMBER) {
+            btnAdd_Topic.invisible()
+        } else {
+            btnAdd_Topic.visible()
+        }
+        tv_token_topic.invisible()
+        progressBar_topic.visible()
+        tv_error_Topic.invisible()
         layoutManager = LinearLayoutManager(context)
         recyclerViewTopic.setHasFixedSize(true)
         recyclerViewTopic.layoutManager = layoutManager
@@ -144,14 +146,15 @@ class TopicFragment : Fragment(), ClickItem {
         recyclerViewTopic.adapter = adapter
         btnAdd_Topic.setOnClickListener {
             roleGroup = 0
-            showDialog("","")
+            showDialog("", "")
         }
         btnBack_topic.setOnClickListener {
             findNavController().popBackStack()
         }
     }
 
-    private fun showDialog(name: String,des: String) {
+    @SuppressLint("SetTextI18n")
+    private fun showDialog(name: String, des: String) {
         val dialog = LayoutInflater.from(context)
             .inflate(R.layout.create_topic_dialog, null)
         val mBuilder = AlertDialog.Builder(context).setView(dialog)
@@ -166,8 +169,8 @@ class TopicFragment : Fragment(), ClickItem {
                 mAlertDialog.dismiss()
             }
             dialog.btn_create_topic.setOnClickListener {
-                var title = dialog.edt_title_topic.text.toString()
-                var des = dialog.edt_des_topic.text.toString()
+                val title = dialog.edt_title_topic.text.toString()
+                val des = dialog.edt_des_topic.text.toString()
 
                 when {
                     title.isEmpty() -> {
@@ -191,8 +194,8 @@ class TopicFragment : Fragment(), ClickItem {
             dialog.edt_des_topic.setText(des)
             dialog.edt_title_topic.setText(name)
             dialog.btn_create_topic.setOnClickListener {
-                var title = dialog.edt_title_topic.text.toString()
-                var des = dialog.edt_des_topic.text.toString()
+                val title = dialog.edt_title_topic.text.toString()
+                val des = dialog.edt_des_topic.text.toString()
                 when {
                     title.isEmpty() -> {
                         dialog.edt_title_topic.error = "You have not entered a title"
@@ -209,7 +212,7 @@ class TopicFragment : Fragment(), ClickItem {
         }
     }
 
-    override fun onClickItem(id: String, role: Int,name: String,des:String) {
+    override fun onClickItem(id: String, role: Int, name: String, description: String) {
         idTopic = id
         roleGroup = role
         when (role) {
@@ -233,12 +236,12 @@ class TopicFragment : Fragment(), ClickItem {
                 )
                 val editor = pref.edit()
                 editor.putString(TOPIC_ID, id)
-                editor.putString(NAME_TOPIC,name)
+                editor.putString(NAME_TOPIC, name)
                 editor.apply()
-                findNavController().navigate(R.id.action_groupFragment_to_topicFragment)
+                findNavController().navigate(R.id.action_topicFragment_to_postFragment)
             }
             else -> {
-                showDialog(name,des)
+                showDialog(name, description)
             }
         }
     }

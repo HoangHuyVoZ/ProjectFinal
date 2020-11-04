@@ -1,9 +1,12 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.projectfinal.utils
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.example.projectfinal.utils.Patterns.PASSWORD
+import androidx.appcompat.app.AppCompatActivity
 import java.util.regex.Pattern
 
 fun View.visible() {
@@ -34,6 +37,14 @@ fun View.hideKeyboard() {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(windowToken, 0)
 }
+
+fun firstTime(context: Context, first: Boolean){
+    val pref: SharedPreferences = context.getSharedPreferences(PREFS_NAME, AppCompatActivity.MODE_PRIVATE)
+    val editor = pref.edit()
+    editor.putBoolean(FIRST_TIME, first)
+    editor.apply()
+}
+
 
 object Patterns {
     val PASSWORD: Pattern = Pattern.compile("^[a-zA-Z0-9_-]{8,30}\$")

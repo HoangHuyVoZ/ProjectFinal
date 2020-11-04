@@ -1,60 +1,100 @@
 package com.example.projectfinal.ui.feed
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
+import com.example.projectfinal.model.comment.commentData
+import com.example.projectfinal.model.feed.feedData
+import com.example.projectfinal.ui.auth.AuthActivity
+import com.example.projectfinal.ui.feed.adapter.FeedAdapter
+import com.example.projectfinal.ui.main.adapter.CommentAdapter
+import com.example.projectfinal.utils.*
+import com.example.projectfinal.viewmodel.FeedViewModel
+import kotlinx.android.synthetic.main.fragment_feed.*
+import kotlinx.android.synthetic.main.fragment_feed.tv_token
+import kotlinx.android.synthetic.main.fragment_group.*
+import kotlinx.android.synthetic.main.fragment_post_detail.*
+import kotlinx.android.synthetic.main.fragment_post_detail.recyclerViewComment
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FeedFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class FeedFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
+class FeedFragment : Fragment() ,ClickItem{
+    lateinit var feedViewModel: FeedViewModel
+    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var adapter: FeedAdapter
+    private lateinit var pref: SharedPreferences
+    private lateinit var accessToken: String
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+        feedViewModel = ViewModelProvider(this).get(FeedViewModel::class.java)
         return inflater.inflate(R.layout.fragment_feed, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FeedFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FeedFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        pref = requireContext().getSharedPreferences(
+            PREFS_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        accessToken = pref.getString(ACCESS_TOKEN, "").toString()
+
+        init()
+        getFeed()
+        dataFeed()
     }
+
+    private fun dataFeed() {
+        feedViewModel.dataFeed.observe(viewLifecycleOwner,{
+            if(it!=null){
+                if(it.success){
+                    progressBar.invisible()
+                    tv_count.text = "${it.result.size} feed"
+                    adapter.clear()
+                    adapter.addList(it.result as MutableList<feedData>)
+                    adapter.notifyDataSetChanged()
+                }else{
+                    tv_error.visible()
+                    tv_error.text= it.message
+                }
+            }else{
+                tv_token.visible()
+                tv_token.setOnClickListener {
+                    context?.let { it -> firstTime(it,true) }
+                    val intent = Intent(activity, AuthActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                }
+                progressBar.invisible()
+
+            }
+        })
+    }
+
+    private fun getFeed() {
+        feedViewModel.getFeed(accessToken)
+    }
+
+    private fun init() {
+        tv_token.invisible()
+        progressBar.visible()
+        tv_error.invisible()
+        layoutManager = LinearLayoutManager(context)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = layoutManager
+        adapter = FeedAdapter(this)
+        recyclerView.adapter = adapter
+    }
+
+    override fun onClickItem(id: String, role: Int, name: String, description: String) {
+
+    }
+
 }

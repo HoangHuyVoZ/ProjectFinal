@@ -1,19 +1,20 @@
 package com.example.projectfinal.ui.auth.fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.projectfinal.R
 import com.example.projectfinal.ui.main.HomeActivity
-import com.example.projectfinal.utils.*
+import com.example.projectfinal.utils.ACCESS_TOKEN
+import com.example.projectfinal.utils.PREFS_NAME
+import com.example.projectfinal.utils.USERNAME
 import com.example.projectfinal.viewmodel.AuthViewModel
 import kotlinx.android.synthetic.main.fragment_hello.*
 
@@ -30,6 +31,7 @@ class HelloFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_hello, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val pref = requireContext().getSharedPreferences(
             PREFS_NAME,
@@ -38,7 +40,7 @@ class HelloFragment : Fragment() {
         if (accessToken != null) {
             authViewModel.getUserData(accessToken)
         }
-        authViewModel.userData.observe(viewLifecycleOwner, Observer {
+        authViewModel.userData.observe(viewLifecycleOwner, {
             if(it!=null){
                 if(it.success){
                     tv_username_hello.text = "Hi, \n${it.result.displayName}"
@@ -48,6 +50,7 @@ class HelloFragment : Fragment() {
 
                     Handler().postDelayed({
                        val intent= Intent(context, HomeActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                     }, 2000)
                 }

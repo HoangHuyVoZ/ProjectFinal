@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/noirpro_bold"
-        android:text="Hi,"
+        android:text="Hi, \n"
         android:visibility="invisible"
         android:id="@+id/tv_username_splash"
         android:textColor="#FFF"

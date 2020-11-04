@@ -1,27 +1,20 @@
 package com.example.projectfinal.ui.auth.fragment
 
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.projectfinal.R
-import com.example.projectfinal.R.drawable.btn_login
-import com.example.projectfinal.R.drawable.login
-import com.example.projectfinal.ui.main.HomeActivity
 import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.AuthViewModel
 import kotlinx.android.synthetic.main.fragment_login.*
-import com.example.projectfinal.R.drawable.btn_login_checked as btn_login_checked1
 
 
 class LoginFragment : Fragment() {
@@ -55,14 +48,15 @@ class LoginFragment : Fragment() {
 }
 
     private fun listenLogin() {
-        authViewModel.loginData.observe(viewLifecycleOwner, Observer {
+        authViewModel.loginData.observe(viewLifecycleOwner, {
             if(it!=null){
                 if(it.success){
                     val pref: SharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, AppCompatActivity.MODE_PRIVATE)
                     val editor = pref.edit()
-                    editor.putBoolean(FIRST_TIME, true)
+                    editor.putBoolean(FIRST_TIME, false)
                     editor.putString(ACCESS_TOKEN,it.result.accessToken)
                     editor.putString(ROLE,it.result.role)
+                    editor.putString(USERNAME_ID,it.result.userId)
                     editor.apply()
                     findNavController().navigate(R.id.action_loginFragment_to_helloFragment)
                     progressBar.invisible()
@@ -76,8 +70,8 @@ class LoginFragment : Fragment() {
     }
 
     private fun checkLogin() {
-        var email = edtEmail_login.text.toString()
-        var pass = edtPass_login.text.toString()
+        val email = edtEmail_login.text.toString()
+        val pass = edtPass_login.text.toString()
         if (!isEmailValid(email)) {
             edtEmail_login.error = "Enter a valid email"
         }

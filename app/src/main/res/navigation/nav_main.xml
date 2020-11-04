@@ -46,5 +46,14 @@
         android:id="@+id/profileFragment"
         android:name="com.example.projectfinal.ui.profile.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_changPassFragment"
+            app:destination="@id/changPassFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/changPassFragment"
+        android:name="com.example.projectfinal.ui.profile.ChangPassFragment"
+        android:label="fragment_chang_pass"
+        tools:layout="@layout/fragment_chang_pass" />
 </navigation>

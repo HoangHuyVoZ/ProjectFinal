@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="15dp"
     app:cardElevation="8dp"
     android:layout_margin="10dp">
     <com.chauthai.swipereveallayout.SwipeRevealLayout
@@ -52,6 +52,8 @@
             android:background="#F44336"/>
     </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/topic_rela"
+            android:background="#F9F9F9"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >

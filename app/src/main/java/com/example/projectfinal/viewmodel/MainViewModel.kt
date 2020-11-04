@@ -4,7 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectfinal.api.CallApi
 import com.example.projectfinal.model.Group.Group
+import com.example.projectfinal.model.post.Post
 import com.example.projectfinal.model.Topic.Topic
+import com.example.projectfinal.model.comment.comment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -21,7 +23,15 @@ class MainViewModel : ViewModel() {
     var createTopicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
     var updateTopicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
     var deleteTopicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
-
+    var postData : MutableLiveData<Post> = MutableLiveData<Post>()
+    var createPostData : MutableLiveData<Post> = MutableLiveData<Post>()
+    var updatePostData : MutableLiveData<Post> = MutableLiveData<Post>()
+    var deletePostData : MutableLiveData<Post> = MutableLiveData<Post>()
+    var postIdData : MutableLiveData<Post> = MutableLiveData<Post>()
+    var commentData : MutableLiveData<comment> = MutableLiveData<comment>()
+    var createComment : MutableLiveData<comment> = MutableLiveData<comment>()
+    var updateComment : MutableLiveData<comment> = MutableLiveData<comment>()
+    var deleteComment : MutableLiveData<comment> = MutableLiveData<comment>()
 
     fun getCreateData(Authorization: String,name: String){
         compositeDisposable.add(
@@ -121,6 +131,120 @@ class MainViewModel : ViewModel() {
                 },{
                     deleteTopicData.value= null
 
+                })
+        )
+    }
+    //post
+    fun getPost(Authorization:String,group_id: String,topic_id: String){
+        compositeDisposable.add(
+            apiManager.getPost(Authorization,group_id,topic_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    postData.value=it
+                },{
+                    postData.value=null
+
+                })
+        )
+    }
+    fun getCreatePost(Authorization: String, group_id: String, topic_id: String, title: String, description: String){
+        compositeDisposable.add(
+            apiManager.getCreatePost(Authorization,group_id,topic_id,title,description)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    createPostData.value= it
+                },{
+                    createPostData.value= null
+
+                })
+        )
+    }
+    fun getUpdatePost(Authorization: String, group_id: String, topic_id: String,post_id: String, name: String, description: String){
+        compositeDisposable.add(
+            apiManager.getUpdatePost(Authorization,group_id,topic_id,post_id,name,description)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    updatePostData.value= it
+                },{
+                    updatePostData.value= null
+
+                })
+        )
+    }
+    fun getDeletePost(Authorization: String,group_id: String,topic_id:String,post_id: String){
+        compositeDisposable.add(
+            apiManager.getDeletePost(Authorization,group_id,topic_id,post_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    deletePostData.value= it
+                },{
+                    deletePostData.value= null
+
+                })
+        )
+    }
+    //comment
+    fun getPostId(Authorization: String,group_id: String,topic_id:String,post_id: String){
+        compositeDisposable.add(
+            apiManager.getPostId(Authorization,group_id,topic_id,post_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    postIdData.value=it
+                },{
+                    postIdData.value=null
+                })
+        )
+    }
+    fun getComment(Authorization: String,group_id: String,topic_id:String,post_id: String){
+        compositeDisposable.add(
+            apiManager.getComment(Authorization,group_id,topic_id,post_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    commentData.value=it
+                },{
+                    commentData.value=null
+                })
+        )
+    }
+    fun getCreateComment(Authorization: String,group_id: String,topic_id:String,post_id: String,descripton: String){
+        compositeDisposable.add(
+            apiManager.getCreateComment(Authorization,group_id,topic_id,post_id,descripton)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    createComment.value=it
+                },{
+                    createComment.value=null
+                })
+        )
+    }
+    fun getUpdateComment(Authorization: String, group_id: String, topic_id:String, post_id: String, comment_id: String, description: String){
+        compositeDisposable.add(
+            apiManager.getUpdateComment(Authorization,group_id,topic_id,post_id,comment_id,description)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    updateComment.value=it
+                },{
+                    updateComment.value=null
+                })
+        )
+    }
+    fun getDeleteComment(Authorization: String, group_id: String, topic_id:String, post_id: String, comment_id: String){
+        compositeDisposable.add(
+            apiManager.getDeleteComment(Authorization,group_id,topic_id,post_id,comment_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    deleteComment.value=it
+                },{
+                    deleteComment.value=null
                 })
         )
     }

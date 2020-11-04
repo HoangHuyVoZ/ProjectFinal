@@ -13,6 +13,7 @@ const val MOD = "moderator"
 const val GROUP_ID = "group_id"
 const val TOPIC_ID = "topic_id"
 const val USERNAME = "username"
+const val USERNAME_ID = "username_id"
 const val NAME_GROUP = "name_group"
 const val NAME_TOPIC = "name_topic"
-
+const val POST_ID = "post_id"

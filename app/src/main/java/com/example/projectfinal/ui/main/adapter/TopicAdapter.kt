@@ -6,27 +6,26 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
-import com.example.projectfinal.model.Group.Groupdata
 import com.example.projectfinal.model.Topic.TopicData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_group.view.*
-import kotlinx.android.synthetic.main.item_group.view.swipelayout
 import kotlinx.android.synthetic.main.item_topic.view.*
 
 class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<TopicAdapter.ViewHolder>() {
-    var list = ArrayList<TopicData>()
+    private var list = ArrayList<TopicData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(list: TopicData) {
+            itemView.swipeLayout_topic.close(true)
             itemView.item_topic.text = list.name
             itemView.item_des_top.text = "Description: ${list.description}"
             val pref = itemView.context.getSharedPreferences(
                 PREFS_NAME,
                 AppCompatActivity.MODE_PRIVATE
             )
-            var role = pref.getString(ROLE, "")
-            var username= pref.getString(USERNAME,"")
+            val role = pref.getString(ROLE, "")
+            val username= pref.getString(USERNAME,"")
             when {
                 role ==ADMIN -> {
                     itemView.txtDelete_topic.gone()
@@ -45,7 +44,7 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        var view: View = LayoutInflater.from(parent.context).inflate(
+        val view: View = LayoutInflater.from(parent.context).inflate(
             R.layout.item_topic,
             parent,
             false
@@ -55,11 +54,11 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val element = list?.get(position)
-        holder.bind(element as TopicData)
-        var id = element.id
-        var name = element.name
-        var des = element.description
+        val element = list[position]
+        holder.bind(element)
+        val id = element.id
+        val name = element.name
+        val des = element.description
         holder.itemView.txtEdit_topic.setOnClickListener {
             onClickItem.onClickItem(id, 1,name,des)
         }
@@ -69,7 +68,7 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
         holder.itemView.txtDelete_topic_admin.setOnClickListener {
             onClickItem.onClickItem(id, 2,name,des)
         }
-        holder.itemView.setOnClickListener {
+        holder.itemView.topic_rela.setOnClickListener {
             onClickItem.onClickItem(id, 4,name,des)
         }
     }
