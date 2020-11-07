@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.projectfinal.R
 import com.example.projectfinal.model.Group.Groupdata
@@ -62,9 +63,7 @@ class GroupFragment : Fragment(), ClickItem {
         mainViewModel.groupData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
-                    adapter.clear()
                     adapter.addList(it.result as MutableList<Groupdata>)
-                    adapter.notifyDataSetChanged()
                     tv_countGroup.text = "Total: ${it.result.size} group"
                     progressBar3.invisible()
 
@@ -95,7 +94,6 @@ class GroupFragment : Fragment(), ClickItem {
             }
             progressBar3.visible()
             mainViewModel.getGroup(accessToken)
-            adapter.clear()
         })
         //update
         mainViewModel.updateGroupData.observe(viewLifecycleOwner, {
@@ -109,7 +107,6 @@ class GroupFragment : Fragment(), ClickItem {
             }
             progressBar3.visible()
             mainViewModel.getGroup(accessToken)
-            adapter.clear()
         })
         //remove
         mainViewModel.deleteGroupData.observe(viewLifecycleOwner, {
@@ -123,7 +120,6 @@ class GroupFragment : Fragment(), ClickItem {
             }
             progressBar3.visible()
             mainViewModel.getGroup(accessToken)
-            adapter.clear()
         })
 
     }

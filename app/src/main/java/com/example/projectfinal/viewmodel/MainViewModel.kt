@@ -15,19 +15,23 @@ class MainViewModel : ViewModel() {
     private val apiManager: CallApi by lazy { CallApi() }
     private val compositeDisposable = CompositeDisposable()
 
+
     var groupData : MutableLiveData<Group> = MutableLiveData<Group>()
     var createData: MutableLiveData<Group> = MutableLiveData<Group>()
     var updateGroupData: MutableLiveData<Group> = MutableLiveData<Group>()
     var deleteGroupData: MutableLiveData<Group> = MutableLiveData<Group>()
+
     var topicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
     var createTopicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
     var updateTopicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
     var deleteTopicData : MutableLiveData<Topic> = MutableLiveData<Topic>()
+
     var postData : MutableLiveData<Post> = MutableLiveData<Post>()
     var createPostData : MutableLiveData<Post> = MutableLiveData<Post>()
     var updatePostData : MutableLiveData<Post> = MutableLiveData<Post>()
     var deletePostData : MutableLiveData<Post> = MutableLiveData<Post>()
     var postIdData : MutableLiveData<Post> = MutableLiveData<Post>()
+
     var commentData : MutableLiveData<comment> = MutableLiveData<comment>()
     var createComment : MutableLiveData<comment> = MutableLiveData<comment>()
     var updateComment : MutableLiveData<comment> = MutableLiveData<comment>()
@@ -95,6 +99,7 @@ class MainViewModel : ViewModel() {
                 })
         )
     }
+
     fun getCreateTopic(Authorization: String,group_id: String,name: String,descripton: String){
         compositeDisposable.add(
             apiManager.getCreateTopic(Authorization,group_id,name,descripton)

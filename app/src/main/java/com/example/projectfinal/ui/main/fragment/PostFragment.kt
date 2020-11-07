@@ -67,9 +67,9 @@ class PostFragment : Fragment(), ClickItem {
             if (it != null) {
                 if (it.success) {
                     tv_countPost.text = "Total: ${it.result.size} post"
-                    adapter.clear()
+//                    adapter.clear()
                     adapter.addList(it.result as MutableList<PostData>)
-                    adapter.notifyDataSetChanged()
+//                    adapter.notifyDataSetChanged()
                     progressBar_Post.invisible()
                 } else {
                     tv_error_Post.text = it.message
@@ -95,7 +95,7 @@ class PostFragment : Fragment(), ClickItem {
                 }
             }
             progressBar_Post.visible()
-            adapter.clear()
+//            adapter.clear()
             mainViewModel.getPost(accessToken, idGroup,idTopic)
 
         })
@@ -108,7 +108,7 @@ class PostFragment : Fragment(), ClickItem {
                 }
             }
             progressBar_Post.visible()
-            adapter.clear()
+//            adapter.clear()
             mainViewModel.getPost(accessToken, idGroup,idTopic)
         })
         mainViewModel.deletePostData.observe(viewLifecycleOwner, {
@@ -120,7 +120,7 @@ class PostFragment : Fragment(), ClickItem {
                 }
             }
             progressBar_Post.visible()
-            adapter.clear()
+//            adapter.clear()
             mainViewModel.getPost(accessToken, idGroup,idTopic)
 
         })

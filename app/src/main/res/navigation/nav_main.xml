@@ -41,7 +41,11 @@
         android:id="@+id/feedFragment"
         android:name="com.example.projectfinal.ui.feed.FeedFragment"
         android:label="fragment_feed"
-        tools:layout="@layout/fragment_feed" />
+        tools:layout="@layout/fragment_feed" >
+        <action
+            android:id="@+id/action_feedFragment_to_feedDetailsFragment"
+            app:destination="@id/feedDetailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.projectfinal.ui.profile.ProfileFragment"
@@ -56,4 +60,9 @@
         android:name="com.example.projectfinal.ui.profile.ChangPassFragment"
         android:label="fragment_chang_pass"
         tools:layout="@layout/fragment_chang_pass" />
+    <fragment
+        android:id="@+id/feedDetailsFragment"
+        android:name="com.example.projectfinal.ui.feed.FeedDetailsFragment"
+        android:label="fragment_feed_details"
+        tools:layout="@layout/fragment_feed_details" />
 </navigation>

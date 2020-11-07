@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
 import com.example.projectfinal.model.Group.Groupdata
@@ -75,6 +76,7 @@ class GroupAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Gr
         notifyDataSetChanged()
     }
     fun addList(items: MutableList<Groupdata>) {
+        list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
@@ -83,4 +85,5 @@ class GroupAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Gr
         list.clear()
         notifyDataSetChanged()
     }
+
 }

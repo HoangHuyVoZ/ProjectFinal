@@ -88,7 +88,7 @@ class PostDetailFragment : Fragment(), ClickItem {
         mainViewModel.commentData.observe(viewLifecycleOwner, {
             if (it != null) {
                 tv_comment_count.text = "${it.result.size} Comment"
-                adapter.clear()
+//                adapter.clear()
                 adapter.addList(it.result as MutableList<commentData>)
                 adapter.notifyDataSetChanged()
             }
@@ -101,7 +101,7 @@ class PostDetailFragment : Fragment(), ClickItem {
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                 }
             }
-            adapter.clear()
+//            adapter.clear()
             mainViewModel.getComment(accessToken, idGroup, idTopic, idPost)
             mainViewModel.getPostId(accessToken, idGroup, idTopic, idPost)
         })
@@ -113,7 +113,7 @@ class PostDetailFragment : Fragment(), ClickItem {
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                 }
             }
-            adapter.clear()
+//            adapter.clear()
             mainViewModel.getComment(accessToken, idGroup, idTopic, idPost)
         })
         mainViewModel.deleteComment.observe(viewLifecycleOwner, {
@@ -124,7 +124,7 @@ class PostDetailFragment : Fragment(), ClickItem {
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                 }
             }
-            adapter.clear()
+//            adapter.clear()
             mainViewModel.getComment(accessToken, idGroup, idTopic, idPost)
         })
     }
@@ -146,6 +146,7 @@ class PostDetailFragment : Fragment(), ClickItem {
         )
         btnSend.setOnClickListener {
             if(edt_comment.text.toString().length>=3){
+                it.hideKeyboard()
                 mainViewModel.getCreateComment(
                     accessToken,
                     idGroup,

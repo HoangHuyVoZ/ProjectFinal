@@ -12,6 +12,7 @@ class FeedViewModel :ViewModel() {
     private val compositeDisposable = CompositeDisposable()
     private val apiManager: CallApi by lazy { CallApi() }
     var dataFeed : MutableLiveData<feed> = MutableLiveData<feed>()
+    var dataFeedID : MutableLiveData<feed> = MutableLiveData<feed>()
 
     fun getFeed(Authorization: String){
         compositeDisposable.add(
@@ -22,6 +23,19 @@ class FeedViewModel :ViewModel() {
                     dataFeed.value = it
                 },{
                     dataFeed.value = null
+
+                })
+        )
+    }
+    fun getFeedID(Authorization: String,feed_id:String){
+        compositeDisposable.add(
+            apiManager.getFeedID(Authorization,feed_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    dataFeedID.value = it
+                },{
+                    dataFeedID.value = null
 
                 })
         )

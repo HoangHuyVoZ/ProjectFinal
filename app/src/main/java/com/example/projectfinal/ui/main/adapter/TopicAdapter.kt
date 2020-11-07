@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
+import com.example.projectfinal.model.Group.Groupdata
 import com.example.projectfinal.model.Topic.TopicData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_group.view.*
@@ -27,16 +29,18 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
             val role = pref.getString(ROLE, "")
             val username= pref.getString(USERNAME,"")
             when {
-                role ==ADMIN -> {
-                    itemView.txtDelete_topic.gone()
-                    itemView.txtEdit_topic.gone()
+                username==list.createdBy && role == ADMIN->{
+                    itemView.txtDelete_topic_admin.gone()
                 }
                 username==list.createdBy -> {
                     itemView.txtDelete_topic_admin.gone()
                 }
+                role ==ADMIN -> {
+                    itemView.txtDelete_topic.gone()
+                    itemView.txtEdit_topic.gone()
+                }
                 else -> {
                     itemView.swipeLayout_topic.setLockDrag(true)
-
                 }
             }
 
@@ -78,6 +82,7 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
     }
 
     fun addList(items: MutableList<TopicData>) {
+        list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
@@ -86,4 +91,5 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
         list.clear()
         notifyDataSetChanged()
     }
+
 }

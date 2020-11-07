@@ -28,10 +28,23 @@ class FeedAdapter(private val onClickItem: ClickItem) :
             itemView.tv_des.text = list.description
             itemView.tv_heart_count.text = list.countLike.toString()
             itemView.tv_comment_count.text= list.countCommentFeed.toString()
+            var checkLike= false
             for(item in list.flags){
                 if(item==userId){
                     itemView.heart.setImageResource(R.drawable.heart)
+                }else{
+                    itemView.heart.setImageResource(R.drawable.heart_empty)
                 }
+            }
+            
+            itemView.heart.setOnClickListener {
+               if(checkLike){
+                   checkLike= false
+                   itemView.heart.setImageResource(R.drawable.heart_empty)
+               }else{
+                   checkLike= true
+                   itemView.heart.setImageResource(R.drawable.heart)
+               }
             }
             when (list.attachments.size) {
                 0->{
@@ -49,6 +62,8 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                     itemView.image_layout2.invisible()
                     itemView.image2_layout2.invisible()
                     itemView.tv_count_image.invisible()
+                    itemView.image_layout1.visible()
+                    itemView.cardView.visible()
                     Glide.with(itemView)
                         .load(list.attachments[0])
                         .into(itemView.image_layout1)
@@ -58,6 +73,10 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                     itemView.image1_layout3.invisible()
                     itemView.image2_layout3.invisible()
                     itemView.tv_count_image.invisible()
+                    itemView.image_layout2.visible()
+                    itemView.image2_layout2.visible()
+                    itemView.cardView.visible()
+
                     Glide.with(itemView)
                         .load(list.attachments[0])
                         .into(itemView.image_layout2)
@@ -69,6 +88,11 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                     itemView.image_layout1.invisible()
                     itemView.tv_count_image.invisible()
                     itemView.image2_layout2.invisible()
+                    itemView.image_layout2.visible()
+                    itemView.cardView.visible()
+                    itemView.image1_layout3.visible()
+                    itemView.image2_layout3.visible()
+
                     Glide.with(itemView)
                         .load(list.attachments[0])
                         .into(itemView.image_layout2)
@@ -82,6 +106,11 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                 else -> {
                     itemView.image_layout1.invisible()
                     itemView.image2_layout2.invisible()
+                    itemView.image_layout2.visible()
+                    itemView.cardView.visible()
+                    itemView.image1_layout3.visible()
+                    itemView.image2_layout3.visible()
+                    itemView.tv_count_image.visible()
                     itemView.tv_count_image.text="+ ${list.attachments.size-3}"
                     Glide.with(itemView)
                         .load(list.attachments[0])
@@ -111,8 +140,8 @@ class FeedAdapter(private val onClickItem: ClickItem) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-//        val id = element.id
-//        val des = element.description
+        val id = element.id
+        val des = element.description
 //        holder.itemView.txtEdit.setOnClickListener {
 //            onClickItem.onClickItem(id, 1,"",des)
 //        }
@@ -122,9 +151,9 @@ class FeedAdapter(private val onClickItem: ClickItem) :
 //        holder.itemView.txtDelete_admin.setOnClickListener {
 //            onClickItem.onClickItem(id, 2,"",des)
 //        }
-//        holder.itemView.relative.setOnClickListener {
-//            onClickItem.onClickItem(id, 4,"",des)
-//        }
+        holder.itemView.feed.setOnClickListener {
+            onClickItem.onClickItem(id, 4,"",des)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -132,6 +161,7 @@ class FeedAdapter(private val onClickItem: ClickItem) :
     }
 
     fun addList(items: MutableList<feedData>) {
+        list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }

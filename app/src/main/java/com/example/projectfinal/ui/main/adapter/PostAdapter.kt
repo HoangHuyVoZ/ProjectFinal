@@ -10,6 +10,7 @@ import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_group.view.*
 import kotlinx.android.synthetic.main.item_post.view.*
+import kotlinx.android.synthetic.main.item_topic.view.*
 
 class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     private var list = ArrayList<PostData>()
@@ -30,15 +31,18 @@ class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Pos
             val role = pref.getString(ROLE, "")
             val username= pref.getString(USERNAME,"")
             when {
-                role == ADMIN -> {
-                    itemView.txtDelete_post.gone()
-                    itemView.txtEdit_post.gone()
+                username==list.createdBy && role ==ADMIN->{
+                    itemView.txtDelete_post_admin.gone()
                 }
                 username==list.createdBy -> {
                     itemView.txtDelete_post_admin.gone()
                 }
-                else -> {
+                role !=ADMIN -> {
                     itemView.swipeLayout_post.setLockDrag(true)
+                }
+                else -> {
+                    itemView.txtDelete_post.gone()
+                    itemView.txtEdit_post.gone()
 
                 }
             }
@@ -81,6 +85,7 @@ class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Pos
     }
 
     fun addList(items: MutableList<PostData>) {
+        list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }

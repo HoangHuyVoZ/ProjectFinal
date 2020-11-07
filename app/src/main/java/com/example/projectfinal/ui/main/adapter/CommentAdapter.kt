@@ -88,6 +88,7 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
     }
 
     fun addList(items: MutableList<commentData>) {
+        list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }

@@ -177,5 +177,21 @@ interface API {
     @GET("feed")
     fun getFeed(
         @Header("Authorization")authorization: String,
+    ): Call<feed>
+    @GET("feed/{feed_id}")
+    fun getFeedID(
+        @Header("Authorization")authorization: String,
+        @Path("feed_id")feed_id: String,
         ): Call<feed>
+    @FormUrlEncoded
+    @PATCH("feed/{feed_id}/addlike")
+    fun getAddLikeFeed(
+        @Header("Authorization")authorization: String,
+        @Path("feed_id")feed_id: String,
+    ): Call<feed>
+    @PATCH("feed/{feed_id}/minusllike")
+    fun getMinusLikeFeed(
+        @Header("Authorization")authorization: String,
+        @Path("feed_id")feed_id: String,
+    ): Call<feed>
 }

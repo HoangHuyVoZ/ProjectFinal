@@ -243,4 +243,9 @@ class CallApi {
             _apiRestFull.getFeed(AUTHORIZATION+authorization)
         )
     }
+    fun getFeedID(authorization: String,feed_id: String): Single<feed>{
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getFeedID(AUTHORIZATION+authorization,feed_id)
+        )
+    }
 }

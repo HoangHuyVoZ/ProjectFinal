@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
 import com.example.projectfinal.model.comment.commentData
@@ -18,6 +19,7 @@ import com.example.projectfinal.ui.feed.adapter.FeedAdapter
 import com.example.projectfinal.ui.main.adapter.CommentAdapter
 import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.FeedViewModel
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_feed.*
 import kotlinx.android.synthetic.main.fragment_feed.tv_token
 import kotlinx.android.synthetic.main.fragment_group.*
@@ -57,9 +59,7 @@ class FeedFragment : Fragment() ,ClickItem{
                 if(it.success){
                     progressBar.invisible()
                     tv_count.text = "${it.result.size} feed"
-                    adapter.clear()
                     adapter.addList(it.result as MutableList<feedData>)
-                    adapter.notifyDataSetChanged()
                 }else{
                     tv_error.visible()
                     tv_error.text= it.message
@@ -94,7 +94,13 @@ class FeedFragment : Fragment() ,ClickItem{
     }
 
     override fun onClickItem(id: String, role: Int, name: String, description: String) {
-
+        val pref: SharedPreferences = requireContext().getSharedPreferences(
+            PREFS_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        val editor = pref.edit()
+        editor.putString(FEED_ID, id)
+            findNavController().navigate(R.id.action_feedFragment_to_feedDetailsFragment)
     }
 
 }

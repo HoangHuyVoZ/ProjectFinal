@@ -14,10 +14,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
+import com.example.projectfinal.model.Group.Groupdata
 import com.example.projectfinal.model.Topic.TopicData
 import com.example.projectfinal.ui.auth.AuthActivity
+import com.example.projectfinal.ui.main.adapter.GroupAdapter
 import com.example.projectfinal.ui.main.adapter.TopicAdapter
 import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.MainViewModel
@@ -65,10 +68,10 @@ class TopicFragment : Fragment(), ClickItem {
             if (it != null) {
                 if (it.success) {
                     tv_countTopic.text = "Total: ${it.result.size} topic"
-                    adapter.clear()
                     adapter.addList(it.result as MutableList<TopicData>)
-                    adapter.notifyDataSetChanged()
                     progressBar_topic.invisible()
+
+
                 } else {
                     tv_error_Topic.text = it.message
                     tv_error_Topic.visible()
@@ -76,7 +79,7 @@ class TopicFragment : Fragment(), ClickItem {
             } else {
                 tv_token_topic.visible()
                 tv_token_topic.setOnClickListener {
-                    context?.let { it -> firstTime(it,true) }
+                    context?.let { it -> firstTime(it, true) }
                     val intent = Intent(activity, AuthActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
@@ -84,6 +87,7 @@ class TopicFragment : Fragment(), ClickItem {
                 progressBar3.invisible()
             }
         })
+
         mainViewModel.createTopicData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
@@ -94,7 +98,6 @@ class TopicFragment : Fragment(), ClickItem {
             }
             progressBar_topic.visible()
             mainViewModel.getTopic(accessToken, idGroup)
-            adapter.clear()
         })
         mainViewModel.updateTopicData.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -106,7 +109,6 @@ class TopicFragment : Fragment(), ClickItem {
             }
             progressBar_topic.visible()
             mainViewModel.getTopic(accessToken, idGroup)
-            adapter.clear()
         })
         mainViewModel.deleteTopicData.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -118,7 +120,6 @@ class TopicFragment : Fragment(), ClickItem {
             }
             progressBar_topic.visible()
             mainViewModel.getTopic(accessToken, idGroup)
-            adapter.clear()
         })
     }
 
@@ -130,6 +131,7 @@ class TopicFragment : Fragment(), ClickItem {
     }
 
     private fun init() {
+
         tv_Topic.text = nameGroup
         if (role == MEMBER) {
             btnAdd_Topic.invisible()
