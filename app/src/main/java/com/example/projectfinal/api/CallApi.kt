@@ -1,14 +1,20 @@
 package com.example.projectfinal.api
 
-import com.example.projectfinal.model.Group.Group
-import com.example.projectfinal.model.post.Post
-import com.example.projectfinal.model.Signup.Signup
-import com.example.projectfinal.model.Topic.Topic
-import com.example.projectfinal.model.user.User
+import com.example.projectfinal.model.group.CreateGroup
+import com.example.projectfinal.model.group.Group
+import com.example.projectfinal.model.signup.Signup
+import com.example.projectfinal.model.topic.CreateTopic
+import com.example.projectfinal.model.topic.Topic
+import com.example.projectfinal.model.topic.updateTopic
+import com.example.projectfinal.model.comment.CreateComment
 import com.example.projectfinal.model.comment.comment
 import com.example.projectfinal.model.feed.feed
+import com.example.projectfinal.model.feed.feedComment
 import com.example.projectfinal.model.login.Login
-import com.example.projectfinal.utils.AUTHORIZATION
+import com.example.projectfinal.model.post.CreatePost
+import com.example.projectfinal.model.post.Post
+import com.example.projectfinal.model.user.User
+import com.example.projectfinal.utils.*
 import io.reactivex.Single
 
 class CallApi {
@@ -42,130 +48,125 @@ class CallApi {
     }
 
     //group
-    fun getGroups(
-        authorization: String
-    ): Single<Group> {
+    fun getGroups(): Single<Group> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getGroups(
-                AUTHORIZATION + authorization
+                AUTHORIZATION + accessToken
             )
         )
     }
-
+    fun getGroupId(groupId:String): Single<Group> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getGroupId(
+                AUTHORIZATION + accessToken, groupId
+            )
+        )
+    }
     fun getCreateGroups(
-        authorization: String, name: String
-    ): Single<Group> {
+        name: String
+    ): Single<CreateGroup> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCreateGroup(
-                AUTHORIZATION + authorization, name
+                AUTHORIZATION + accessToken, name
             )
         )
     }
 
     fun getUpdateGroup(
-        authorization: String, group_id: String, name: String
-    ): Single<Group> {
+        name: String
+    ): Single<CreateGroup> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getUpdateGroup(AUTHORIZATION + authorization, group_id, name)
+            _apiRestFull.getUpdateGroup(AUTHORIZATION + accessToken, groupId, name)
         )
     }
 
-    fun getDeleteGroup(
-        authorization: String, group_id: String
-    ): Single<Group> {
+    fun getDeleteGroup(): Single<CreateGroup> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getDeleteGroup(AUTHORIZATION + authorization, group_id)
+            _apiRestFull.getDeleteGroup(AUTHORIZATION + accessToken, groupId)
         )
     }
 
     //topic
     fun getTopic(
-        authorization: String, group_id: String
     ): Single<Topic> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getTopic(
-                AUTHORIZATION + authorization,
-                group_id
+                AUTHORIZATION + accessToken, groupId
             )
         )
     }
-
-    fun getCreateTopic(
-        authorization: String, group_id: String, name: String, description: String
+    fun getTopicId(topicId: String
     ): Single<Topic> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getTopic(
+                AUTHORIZATION + accessToken, groupId, topicId
+            )
+        )
+    }
+    fun getCreateTopic(
+       name: String, description: String
+    ): Single<CreateTopic> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCreateTopic(
-                AUTHORIZATION + authorization,
-                group_id, name, description
+                AUTHORIZATION + accessToken, groupId, name, description
             )
         )
     }
 
-    fun getUpdateTopic(
-        authorization: String, group_id: String, topic_id: String, name: String, description: String
-    ): Single<Topic> {
+    fun getUpdateTopic(name: String, description: String
+    ): Single<updateTopic> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUpdateTopic(
-                AUTHORIZATION + authorization,
-                group_id, topic_id, name, description
+                AUTHORIZATION + accessToken, groupId, topicId, name, description
             )
         )
     }
 
     fun getDeleteTopic(
-        authorization: String, group_id: String, topic_id: String
-    ): Single<Topic> {
+    ): Single<CreateTopic> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getDeleteTopic(
-                AUTHORIZATION + authorization,
-                group_id, topic_id
+                AUTHORIZATION + accessToken, groupId, topicId
             )
         )
     }
 
     //user
     fun getUserInfo(
-        authorization: String
+
     ): Single<User> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUserInfo(
-                AUTHORIZATION + authorization,
+                AUTHORIZATION + accessToken,
             )
         )
     }
 
     fun getUserChangePass(
-        authorization: String, old: String, new: String, renew: String
+     old: String, new: String, renew: String
     ): Single<User> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUserChangePass(
-                AUTHORIZATION + authorization,
+                AUTHORIZATION + accessToken,
                 old, new, renew
             )
         )
     }
 
     //post
-    fun getPost(
-        authorization: String, group_id: String, topic_id: String
-    ): Single<Post> {
+    fun getPost(): Single<Post> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getPost(AUTHORIZATION + authorization, group_id, topic_id)
+            _apiRestFull.getPost(AUTHORIZATION + accessToken, groupId, topicId)
         )
     }
 
     fun getCreatePost(
-        authorization: String,
-        group_id: String,
-        topic_id: String,
         title: String,
         description: String
-    ): Single<Post> {
+    ): Single<CreatePost> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCreatePost(
-                AUTHORIZATION + authorization,
-                group_id,
-                topic_id,
+                AUTHORIZATION + accessToken, groupId, topicId,
                 title,
                 description
             )
@@ -173,19 +174,13 @@ class CallApi {
     }
 
     fun getUpdatePost(
-        authorization: String,
-        group_id: String,
-        topic_id: String,
-        post_id: String,
         title: String,
         description: String
-    ): Single<Post> {
+    ): Single<CreatePost> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUpdatePost(
-                AUTHORIZATION + authorization,
-                group_id,
-                topic_id,
-                post_id,
+                AUTHORIZATION + accessToken, groupId, topicId,
+                postId,
                 title,
                 description
             )
@@ -193,59 +188,117 @@ class CallApi {
     }
 
     fun getDeletePost(
-        authorization: String, group_id: String, topic_id: String, post_id: String
-    ): Single<Post> {
+    ): Single<CreatePost> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getDeletePost(AUTHORIZATION + authorization, group_id, topic_id, post_id)
+            _apiRestFull.getDeletePost(AUTHORIZATION + accessToken, groupId, topicId, postId)
         )
     }
 
     //comment
-    fun getPostId(
-        authorization: String, group_id: String, topic_id: String, post_id: String
-    ): Single<Post> {
+    fun getPostId(): Single<Post> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getPostId(AUTHORIZATION + authorization, group_id, topic_id, post_id)
+            _apiRestFull.getPostId(AUTHORIZATION + accessToken, groupId, topicId, postId)
         )
     }
 
     fun getComment(
-        authorization: String, group_id: String, topic_id: String, post_id: String
     ): Single<comment> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getComment(AUTHORIZATION + authorization, group_id, topic_id, post_id)
+            _apiRestFull.getComment(AUTHORIZATION + accessToken, groupId, topicId, postId)
         )
     }
+
     fun getCreateComment(
-        authorization: String, group_id: String, topic_id: String, post_id: String,description: String
-    ): Single<comment> {
+        description: String
+    ): Single<CreateComment> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getCreateComment(AUTHORIZATION + authorization, group_id, topic_id, post_id,description)
+            _apiRestFull.getCreateComment(
+                AUTHORIZATION + accessToken, groupId, topicId, postId,
+                description
+            )
         )
     }
+
     fun getUpdateComment(
-        authorization: String, group_id: String, topic_id: String, post_id: String,description: String,comment_id: String
-    ): Single<comment> {
+
+        description: String,
+    ): Single<CreateComment> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getUpdateComment(AUTHORIZATION + authorization, group_id, topic_id, post_id,comment_id,description)
+            _apiRestFull.getUpdateComment(
+                AUTHORIZATION + accessToken, groupId, topicId, postId,
+                commentId,
+                description
+            )
         )
     }
+
     fun getDeleteComment(
-        authorization: String, group_id: String, topic_id: String, post_id: String,comment_id: String
-    ): Single<comment> {
+    ): Single<CreateComment> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getDeleteComment(AUTHORIZATION + authorization, group_id, topic_id, post_id,comment_id)
+            _apiRestFull.getDeleteComment(
+                AUTHORIZATION + accessToken, groupId, topicId, postId, commentId
+            )
         )
     }
+
     //feed
-    fun getFeed(authorization: String): Single<feed>{
+    fun getFeed(): Single<feed> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getFeed(AUTHORIZATION+authorization)
+            _apiRestFull.getFeed(AUTHORIZATION + accessToken)
         )
     }
-    fun getFeedID(authorization: String,feed_id: String): Single<feed>{
+
+    fun getFeedID(): Single<feed> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getFeedID(AUTHORIZATION+authorization,feed_id)
+            _apiRestFull.getFeedID(AUTHORIZATION + accessToken, feedId)
+        )
+    }
+
+    fun getDeleteFeedID(): Single<feed> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getDeleteFeedID(AUTHORIZATION + accessToken, feedId)
+        )
+    }
+
+    fun getFeedComment(): Single<feedComment> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getFeedComment(AUTHORIZATION + accessToken, feedId)
+        )
+    }
+
+    fun getCreateFeedComment(
+        description: String
+    ): Single<feedComment> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getCreateFeedComment(AUTHORIZATION + accessToken, feedId, description)
+        )
+    }
+
+    fun getUpdateFeedComment(
+        description: String,
+    ): Single<feedComment> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getUpdateFeedComment(
+                AUTHORIZATION + accessToken, feedId,commentId,
+                description
+
+            )
+        )
+    }
+
+    fun getDeleteFeedComment(
+    ): Single<feedComment> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getDeleteFeedComment(AUTHORIZATION + accessToken, feedId,commentId,)
+        )
+    }
+
+    fun getCreateFeed(
+        description: String,
+        attachments: ArrayList<String>
+    ): Single<feed> {
+        return RetrofitInstants.buildRequest(
+            _apiRestFull.getCreateFeed(AUTHORIZATION + accessToken, description, attachments)
         )
     }
 }

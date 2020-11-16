@@ -12,9 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.projectfinal.R
 import com.example.projectfinal.ui.main.HomeActivity
-import com.example.projectfinal.utils.ACCESS_TOKEN
-import com.example.projectfinal.utils.PREFS_NAME
-import com.example.projectfinal.utils.USERNAME
+import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.AuthViewModel
 import kotlinx.android.synthetic.main.fragment_hello.*
 
@@ -36,10 +34,8 @@ class HelloFragment : Fragment() {
         val pref = requireContext().getSharedPreferences(
             PREFS_NAME,
             AppCompatActivity.MODE_PRIVATE)
-        val accessToken = pref.getString(ACCESS_TOKEN, "")
-        if (accessToken != null) {
-            authViewModel.getUserData(accessToken)
-        }
+            authViewModel.getUserData()
+
         authViewModel.userData.observe(viewLifecycleOwner, {
             if(it!=null){
                 if(it.success){
@@ -47,6 +43,7 @@ class HelloFragment : Fragment() {
                     val editor = pref.edit()
                     editor.putString(USERNAME, it.result.displayName)
                     editor.apply()
+                    username= it.result.displayName
 
                     Handler().postDelayed({
                        val intent= Intent(context, HomeActivity::class.java)

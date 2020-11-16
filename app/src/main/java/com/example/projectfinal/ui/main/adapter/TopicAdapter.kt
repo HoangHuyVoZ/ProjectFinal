@@ -4,13 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
-import com.example.projectfinal.model.Group.Groupdata
-import com.example.projectfinal.model.Topic.TopicData
+import com.example.projectfinal.model.topic.TopicData
 import com.example.projectfinal.utils.*
-import kotlinx.android.synthetic.main.item_group.view.*
 import kotlinx.android.synthetic.main.item_topic.view.*
 
 class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<TopicAdapter.ViewHolder>() {
@@ -64,29 +61,43 @@ class TopicAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<To
         val name = element.name
         val des = element.description
         holder.itemView.txtEdit_topic.setOnClickListener {
-            onClickItem.onClickItem(id, 1,name,des)
+            onClickItem.onClickItem(id, 2,name,des,position)
         }
         holder.itemView.txtDelete_topic.setOnClickListener {
-            onClickItem.onClickItem(id, 2,name,des)
+            onClickItem.onRemoveClick(position, id)
         }
         holder.itemView.txtDelete_topic_admin.setOnClickListener {
-            onClickItem.onClickItem(id, 2,name,des)
+            onClickItem.onClickItem(id, 2,name,des,position)
         }
         holder.itemView.topic_rela.setOnClickListener {
-            onClickItem.onClickItem(id, 4,name,des)
+            onClickItem.onClickItem(id, 4,name,des,position)
         }
     }
 
     override fun getItemCount(): Int {
         return list.size
     }
-
+    fun getList(): ArrayList<TopicData>{
+        return list
+    }
     fun addList(items: MutableList<TopicData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
+    fun addItem(item: TopicData) {
+        list.add(0, item)
+        notifyItemInserted(0)
+    }
 
+    fun updateItem(item: TopicData, position: Int) {
+        list[position] = item
+        notifyItemChanged(position)
+    }
+    fun remove(position: Int) {
+        list.removeAt(position)
+        notifyItemRemoved(position)
+    }
     fun clear() {
         list.clear()
         notifyDataSetChanged()

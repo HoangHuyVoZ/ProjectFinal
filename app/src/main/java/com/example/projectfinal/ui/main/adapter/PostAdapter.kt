@@ -8,11 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
 import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.utils.*
-import kotlinx.android.synthetic.main.item_group.view.*
 import kotlinx.android.synthetic.main.item_post.view.*
-import kotlinx.android.synthetic.main.item_topic.view.*
 
-class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
+class PostAdapter(private val onClickItem: ClickItem) :
+    RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     private var list = ArrayList<PostData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,15 +28,15 @@ class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Pos
                 AppCompatActivity.MODE_PRIVATE
             )
             val role = pref.getString(ROLE, "")
-            val username= pref.getString(USERNAME,"")
+            val username = pref.getString(USERNAME, "")
             when {
-                username==list.createdBy && role ==ADMIN->{
+                username == list.createdBy && role == ADMIN -> {
                     itemView.txtDelete_post_admin.gone()
                 }
-                username==list.createdBy -> {
+                username == list.createdBy -> {
                     itemView.txtDelete_post_admin.gone()
                 }
-                role !=ADMIN -> {
+                role != ADMIN -> {
                     itemView.swipeLayout_post.setLockDrag(true)
                 }
                 else -> {
@@ -67,16 +66,16 @@ class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Pos
         val title = element.title
         val des = element.description
         holder.itemView.txtEdit_post.setOnClickListener {
-            onClickItem.onClickItem(id, 1,title,des)
+            onClickItem.onClickItem(id, 2, title, des, position)
         }
         holder.itemView.txtDelete_post.setOnClickListener {
-            onClickItem.onClickItem(id, 2,title,des)
+            onClickItem.onRemoveClick(position, id)
         }
         holder.itemView.txtDelete_post_admin.setOnClickListener {
-            onClickItem.onClickItem(id, 2,title,des)
+            onClickItem.onRemoveClick(position, id)
         }
         holder.itemView.post_rela.setOnClickListener {
-            onClickItem.onClickItem(id, 4,title,des)
+            onClickItem.onClickItem(id, 4, title, des, position)
         }
     }
 
@@ -84,10 +83,30 @@ class PostAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<Pos
         return list.size
     }
 
+    fun getList(): ArrayList<PostData> {
+        return list
+    }
+
     fun addList(items: MutableList<PostData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
+
+    }
+
+    fun addItem(item: PostData) {
+        list.add(0, item)
+        notifyItemInserted(0)
+    }
+
+    fun updateItem(item: PostData, position: Int) {
+        list[position] = item
+        notifyItemChanged(position)
+    }
+
+    fun remove(position: Int) {
+        list.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     fun clear() {

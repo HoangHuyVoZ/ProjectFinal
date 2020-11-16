@@ -12,10 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.projectfinal.R
 import com.example.projectfinal.ui.main.HomeActivity
-import com.example.projectfinal.utils.FIRST_TIME
-import com.example.projectfinal.utils.PREFS_NAME
-import com.example.projectfinal.utils.USERNAME
-import com.example.projectfinal.utils.visible
+import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.fragment_splash.*
 
 @Suppress("DEPRECATION")
@@ -37,15 +34,18 @@ class SplashFragment : Fragment() {
                 AppCompatActivity.MODE_PRIVATE
             )
             val fistTime = pref.getBoolean(FIRST_TIME, true)
-            val name = pref.getString(USERNAME, "...")
+            accessToken = pref.getString(ACCESS_TOKEN, "")
+            username = pref.getString(USERNAME, "...")
+            role = pref.getString("ROLE", "")
             if (fistTime) {
                 findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
             } else {
                 tv_username_splash.visible()
-                tv_username_splash.text = "Hi, \n$name"
+                tv_username_splash.text = "Hi, \n$username"
                 val intent = Intent(context, HomeActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity (intent)
+                startActivity(intent)
+                activity?.finish()
             }
         }, 2000)
     }

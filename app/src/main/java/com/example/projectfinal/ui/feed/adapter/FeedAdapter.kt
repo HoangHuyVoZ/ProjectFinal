@@ -4,12 +4,19 @@ package com.example.projectfinal.ui.feed.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
+import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.projectfinal.R
+import com.example.projectfinal.model.feed.feedComment
+import com.example.projectfinal.model.feed.feedCommentData
 import com.example.projectfinal.model.feed.feedData
 import com.example.projectfinal.utils.*
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_feed.view.*
 
 class FeedAdapter(private val onClickItem: ClickItem) :
@@ -36,7 +43,7 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                     itemView.heart.setImageResource(R.drawable.heart_empty)
                 }
             }
-            
+
             itemView.heart.setOnClickListener {
                if(checkLike){
                    checkLike= false
@@ -142,17 +149,22 @@ class FeedAdapter(private val onClickItem: ClickItem) :
         holder.bind(element)
         val id = element.id
         val des = element.description
-//        holder.itemView.txtEdit.setOnClickListener {
-//            onClickItem.onClickItem(id, 1,"",des)
-//        }
-//        holder.itemView.txtDelete.setOnClickListener {
-//            onClickItem.onClickItem(id, 2,"",des)
-//        }
-//        holder.itemView.txtDelete_admin.setOnClickListener {
-//            onClickItem.onClickItem(id, 2,"",des)
-//        }
+        holder.itemView.btn_more.setOnClickListener {
+            val popupMenu: PopupMenu = PopupMenu(holder.itemView.context,holder.itemView.btn_more)
+            popupMenu.menuInflater.inflate(R.menu.popup_menu,popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+                when(item.itemId) {
+                    R.id.Delete ->
+                        onClickItem.onClickItem(id, 2,"",des,position)
+                    R.id.CreateFeedFragment ->
+                        Toast.makeText(holder.itemView.context, "You Clicked : " + item.title, Toast.LENGTH_SHORT).show()
+                }
+                true
+            })
+            popupMenu.show()
+        }
         holder.itemView.feed.setOnClickListener {
-            onClickItem.onClickItem(id, 4,"",des)
+            onClickItem.onClickItem(id, 4,"",des,position)
         }
     }
 
@@ -160,12 +172,15 @@ class FeedAdapter(private val onClickItem: ClickItem) :
         return list.size
     }
 
-    fun addList(items: MutableList<feedData>) {
+    fun addList(items: List<feedData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
-
+    fun remove(position: Int){
+        list.removeAt(position)
+        notifyDataSetChanged()
+    }
     fun clear() {
         list.clear()
         notifyDataSetChanged()

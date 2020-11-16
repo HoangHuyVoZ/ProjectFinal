@@ -3,7 +3,7 @@ package com.example.projectfinal.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectfinal.api.CallApi
-import com.example.projectfinal.model.Signup.Signup
+import com.example.projectfinal.model.signup.Signup
 import com.example.projectfinal.model.user.User
 import com.example.projectfinal.model.login.Login
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -19,10 +19,10 @@ class AuthViewModel : ViewModel() {
     var userData: MutableLiveData<User> = MutableLiveData<User>()
     var userChangPass: MutableLiveData<User> = MutableLiveData<User>()
 
-    fun getUserChangPass(accessToken: String,old:String,new:String,renew:String){
+    fun getUserChangPass(old:String,new:String,renew:String){
         compositeDisposable.add(
             apiManager.getUserChangePass(
-                accessToken,old,new,renew)
+                old,new,renew)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -34,9 +34,9 @@ class AuthViewModel : ViewModel() {
         )
 
     }
-    fun getUserData(accessToken : String) {
+    fun getUserData() {
         compositeDisposable.add(
-            apiManager.getUserInfo(accessToken)
+            apiManager.getUserInfo()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({

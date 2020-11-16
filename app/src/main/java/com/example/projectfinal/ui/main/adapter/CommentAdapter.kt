@@ -1,9 +1,5 @@
 package com.example.projectfinal.ui.main.adapter
 
-import com.bumptech.glide.Glide
-import com.example.projectfinal.model.post.CommentPost
-import kotlinx.android.synthetic.main.item_comment.view.*
-
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
 import com.example.projectfinal.model.comment.commentData
 import com.example.projectfinal.utils.*
-import kotlinx.android.synthetic.main.item_comment.view.txtDelete
-import kotlinx.android.synthetic.main.item_comment.view.txtEdit
-import kotlinx.android.synthetic.main.item_group.view.*
+import kotlinx.android.synthetic.main.item_comment.view.*
 
 class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
     private var list = ArrayList<commentData>()
@@ -25,9 +19,7 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
         fun bind(list: commentData) {
             itemView.tv_username.text = list.createdBy
             itemView.swipe.close(true)
-            if(list.status=="active"){
-                itemView.active.setImageResource(R.drawable.active_on)
-            }
+
 
             itemView.tv_count_like.text = list.countLike.toString() ?: "0"
             itemView.tv_des_comment.text = list.description
@@ -38,15 +30,15 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
             val role = pref.getString(ROLE, "")
             val username= pref.getString(USERNAME,"")
             when {
-                role == MEMBER -> {
-                    itemView.swipe.setLockDrag(true)
+                role == ADMIN -> {
+                    itemView.txtDelete.gone()
+                    itemView.txtEdit.gone()
                 }
                 username==list.createdBy -> {
                     itemView.txtDelete_admin.gone()
                 }
                 else -> {
-                    itemView.txtDelete.gone()
-                    itemView.txtEdit.gone()
+                    itemView.swipe.setLockDrag(true)
 
                 }
             }
@@ -70,16 +62,13 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
         val id = element.id
         val des = element.description
         holder.itemView.txtEdit.setOnClickListener {
-            onClickItem.onClickItem(id, 1,"",des)
+            onClickItem.onClickItem(id, 1,"",des,position)
         }
         holder.itemView.txtDelete.setOnClickListener {
-            onClickItem.onClickItem(id, 2,"",des)
+            onClickItem.onRemoveClick(position,id)
         }
         holder.itemView.txtDelete_admin.setOnClickListener {
-            onClickItem.onClickItem(id, 2,"",des)
-        }
-        holder.itemView.relative.setOnClickListener {
-            onClickItem.onClickItem(id, 4,"",des)
+            onClickItem.onRemoveClick(position,id)
         }
     }
 
@@ -87,10 +76,27 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
         return list.size
     }
 
+    fun remove(position: Int) {
+        list.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
     fun addList(items: MutableList<commentData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
+    }
+    fun getList(): ArrayList<commentData>{
+        return list
+    }
+    fun addItem(item: commentData) {
+        list.add(0, item)
+        notifyItemInserted(0)
+    }
+
+    fun updateItem(item: commentData, position: Int) {
+        list[position] = item
+        notifyItemChanged(position)
     }
 
     fun clear() {

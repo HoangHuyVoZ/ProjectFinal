@@ -58,8 +58,8 @@
             android:layout_height="35dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:src="@drawable/avatar"
-            android:contentDescription="@string/todo" />
+            android:contentDescription="@string/todo"
+            android:src="@drawable/avatar" />
 
         <TextView
             android:id="@+id/tv_username"
@@ -72,15 +72,6 @@
             android:text="@string/description"
             android:textColor="@color/colorPrimary" />
 
-        <ImageView
-            android:id="@+id/active"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="32dp"
-            android:layout_toEndOf="@id/tv_username"
-            android:src="@drawable/active_off"
-            android:contentDescription="@string/todo" />
 
         <ImageView
             android:id="@+id/imageView7"
@@ -89,8 +80,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@id/tv_count_like"
-            android:src="@drawable/heart_empty"
-            android:contentDescription="@string/todo" />
+            android:contentDescription="@string/todo"
+            android:src="@drawable/heart_empty" />
 
         <TextView
             android:id="@+id/tv_count_like"

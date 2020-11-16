@@ -1,15 +1,12 @@
-package com.example.projectfinal.model.Group
+package com.example.projectfinal.model.group
 
 
 import com.google.gson.annotations.SerializedName
 
-data class Groupdata(
-    @SerializedName("createdAt")
+data class GroupIdData(
     val createdAt: String,
-    @SerializedName("createdBy")
     val createdBy: String,
     @SerializedName("_id")
     val id: String,
-    @SerializedName("name")
     val name: String
 )

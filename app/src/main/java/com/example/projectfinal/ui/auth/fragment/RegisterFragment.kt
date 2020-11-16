@@ -8,19 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.projectfinal.R
 import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.AuthViewModel
+import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.fragment_register.*
 
 
 class RegisterFragment : Fragment() {
     private lateinit var authViewModel: AuthViewModel
-    var gender: String = "male"
+    var gender: String? = "male"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -70,8 +70,8 @@ class RegisterFragment : Fragment() {
             }
         } else {
             progressBar2.visible()
-            Toast.makeText(context, "Register successfully !", Toast.LENGTH_SHORT).show()
-            authViewModel.getRegister(email, pass, user, gender)
+            FancyToast.makeText(context, "Register successfully !", FancyToast.LENGTH_SHORT,FancyToast.SUCCESS,false).show()
+            authViewModel.getRegister(email, pass, user, gender?:"male")
         }
     }
 

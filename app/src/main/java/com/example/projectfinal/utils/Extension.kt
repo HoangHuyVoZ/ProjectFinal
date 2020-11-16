@@ -7,6 +7,10 @@ import android.content.SharedPreferences
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectfinal.R
+import com.example.projectfinal.ui.main.HomeActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.activity_home.*
 import java.util.regex.Pattern
 
 fun View.visible() {
@@ -59,4 +63,11 @@ object Patterns {
                 "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
                 ")+"
     )
+}
+fun HomeActivity.hideBottomNav(checkBottom : Boolean){
+    if(checkBottom)
+    this.bottom.visibility = View.GONE
+    else{
+        this.bottom.visibility = View.VISIBLE
+    }
 }
