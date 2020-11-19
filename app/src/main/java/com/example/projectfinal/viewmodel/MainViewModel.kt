@@ -1,17 +1,21 @@
 package com.example.projectfinal.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectfinal.api.CallApi
-import com.example.projectfinal.model.group.CreateGroup
-import com.example.projectfinal.model.group.Group
-import com.example.projectfinal.model.topic.CreateTopic
-import com.example.projectfinal.model.post.Post
-import com.example.projectfinal.model.topic.Topic
-import com.example.projectfinal.model.topic.updateTopic
-import com.example.projectfinal.model.comment.CreateComment
-import com.example.projectfinal.model.comment.comment
-import com.example.projectfinal.model.post.CreatePost
+import com.example.projectfinal.model.BaseResponse
+import com.example.projectfinal.model.BaseResponseList
+import com.example.projectfinal.model.comment.CreateCommentData
+import com.example.projectfinal.model.comment.commentData
+import com.example.projectfinal.model.group.CreateGroupData
+import com.example.projectfinal.model.group.Groupdata
+import com.example.projectfinal.model.group.UpdateGroupData
+import com.example.projectfinal.model.post.CreatePostData
+import com.example.projectfinal.model.post.PostData
+import com.example.projectfinal.model.topic.CreateTopicData
+import com.example.projectfinal.model.topic.TopicData
+import com.example.projectfinal.model.topic.UpdateTopicData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -21,34 +25,56 @@ class MainViewModel : ViewModel() {
     private val compositeDisposable = CompositeDisposable()
 
 
-    var groupData: MutableLiveData<Group> = MutableLiveData<Group>()
-    var groupDataId: MutableLiveData<Group> = MutableLiveData<Group>()
-    var createData: MutableLiveData<CreateGroup> = MutableLiveData<CreateGroup>()
-    var updateGroupData: MutableLiveData<CreateGroup> = MutableLiveData<CreateGroup>()
-    var deleteGroupData: MutableLiveData<CreateGroup> = MutableLiveData<CreateGroup>()
+    var groupData: MutableLiveData<BaseResponseList<Groupdata>> =
+        MutableLiveData<BaseResponseList<Groupdata>>()
+    var groupDataId: MutableLiveData<BaseResponseList<Groupdata>> =
+        MutableLiveData<BaseResponseList<Groupdata>>()
+    var createData: MutableLiveData<BaseResponse<CreateGroupData>> =
+        MutableLiveData<BaseResponse<CreateGroupData>>()
+    var updateGroupData: MutableLiveData<BaseResponse<UpdateGroupData>> =
+        MutableLiveData<BaseResponse<UpdateGroupData>>()
+    var deleteGroupData: MutableLiveData<BaseResponse<CreateGroupData>> =
+        MutableLiveData<BaseResponse<CreateGroupData>>()
     var countGroupData: MutableLiveData<Int> = MutableLiveData<Int>()
 
-    var topicData: MutableLiveData<Topic> = MutableLiveData<Topic>()
-    var topicDataId: MutableLiveData<Topic> = MutableLiveData<Topic>()
-    var createTopicData: MutableLiveData<CreateTopic> = MutableLiveData<CreateTopic>()
-    var updateTopicData: MutableLiveData<updateTopic> = MutableLiveData<updateTopic>()
-    var deleteTopicData: MutableLiveData<CreateTopic> = MutableLiveData<CreateTopic>()
+    var topicData: MutableLiveData<BaseResponseList<TopicData>> =
+        MutableLiveData<BaseResponseList<TopicData>>()
+    var topicDataId: MutableLiveData<BaseResponseList<TopicData>> =
+        MutableLiveData<BaseResponseList<TopicData>>()
+    var createTopicData: MutableLiveData<BaseResponse<CreateTopicData>> =
+        MutableLiveData<BaseResponse<CreateTopicData>>()
+    var updateTopicData: MutableLiveData<BaseResponse<UpdateTopicData>> =
+        MutableLiveData<BaseResponse<UpdateTopicData>>()
+    var deleteTopicData: MutableLiveData<BaseResponse<CreateTopicData>> =
+        MutableLiveData<BaseResponse<CreateTopicData>>()
     var countTopicData: MutableLiveData<Int> = MutableLiveData<Int>()
 
     var countPostData: MutableLiveData<Int> = MutableLiveData<Int>()
-    var postData: MutableLiveData<Post> = MutableLiveData<Post>()
-    var createPostData: MutableLiveData<CreatePost> = MutableLiveData<CreatePost>()
-    var updatePostData: MutableLiveData<CreatePost> = MutableLiveData<CreatePost>()
-    var deletePostData: MutableLiveData<CreatePost> = MutableLiveData<CreatePost>()
-    var postIdData: MutableLiveData<Post> = MutableLiveData<Post>()
+    var postData: MutableLiveData<BaseResponseList<PostData>> =
+        MutableLiveData<BaseResponseList<PostData>>()
+    var createPostData: MutableLiveData<BaseResponse<CreatePostData>> =
+        MutableLiveData<BaseResponse<CreatePostData>>()
+    var updatePostData: MutableLiveData<BaseResponse<CreatePostData>> =
+        MutableLiveData<BaseResponse<CreatePostData>>()
+    var deletePostData: MutableLiveData<BaseResponse<CreatePostData>> =
+        MutableLiveData<BaseResponse<CreatePostData>>()
+    var postIdData: MutableLiveData<BaseResponseList<PostData>> =
+        MutableLiveData<BaseResponseList<PostData>>()
 
-    var commentData: MutableLiveData<comment> = MutableLiveData<comment>()
-    var createComment: MutableLiveData<CreateComment> = MutableLiveData<CreateComment>()
-    var updateComment: MutableLiveData<CreateComment> = MutableLiveData<CreateComment>()
-    var deleteComment: MutableLiveData<CreateComment> = MutableLiveData<CreateComment>()
+    var commentData: MutableLiveData<BaseResponseList<commentData>> =
+        MutableLiveData<BaseResponseList<commentData>>()
+    var commentIdData: MutableLiveData<BaseResponseList<commentData>> =
+        MutableLiveData<BaseResponseList<commentData>>()
+    var createComment: MutableLiveData<BaseResponse<CreateCommentData>> =
+        MutableLiveData<BaseResponse<CreateCommentData>>()
+    var updateComment: MutableLiveData<BaseResponse<CreateCommentData>> =
+        MutableLiveData<BaseResponse<CreateCommentData>>()
+    var deleteComment: MutableLiveData<BaseResponse<CreateCommentData>> =
+        MutableLiveData<BaseResponse<CreateCommentData>>()
     var countCommentData: MutableLiveData<Int> = MutableLiveData<Int>()
 
-    fun getCreateData( name: String) {
+
+    fun getCreateData(name: String) {
         compositeDisposable.add(
             apiManager.getCreateGroups(name)
                 .subscribeOn(Schedulers.io())
@@ -56,7 +82,9 @@ class MainViewModel : ViewModel() {
                 .subscribe({
                     if (it.success) {
                         createData.value = it
-                        getGroupId(it.result.id)
+                        if (it.result != null) {
+                            getGroupId(it.result.id)
+                        }
                         countGroupData.value = countGroupData.value?.plus(1)
                     } else {
                         createData.value = it
@@ -81,7 +109,8 @@ class MainViewModel : ViewModel() {
                 })
         )
     }
-    fun getGroupId(groupId: String) {
+
+    private fun getGroupId(groupId: String) {
         compositeDisposable.add(
             apiManager.getGroupId(groupId)
                 .subscribeOn(Schedulers.io())
@@ -93,23 +122,26 @@ class MainViewModel : ViewModel() {
                 })
         )
     }
-    fun getUpdateGroup( name: String) {
+
+    fun getUpdateGroup(groupId: String, name: String) {
         compositeDisposable.add(
-            apiManager.getUpdateGroup( name)
+            apiManager.getUpdateGroup(groupId, name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     updateGroupData.value = it
-                    getGroupId(it.result.id)
+                    if (it.result != null) {
+                        getGroupId(it.result.id)
+                    }
                 }, {
                     updateGroupData.value = null
                 })
         )
     }
 
-    fun getDeleteGroup() {
+    fun getDeleteGroup(groupId: String) {
         compositeDisposable.add(
-            apiManager.getDeleteGroup()
+            apiManager.getDeleteGroup(groupId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -128,9 +160,9 @@ class MainViewModel : ViewModel() {
     }
 
     //topic
-    fun getTopic() {
+    fun getTopic(groupId: String) {
         compositeDisposable.add(
-            apiManager.getTopic()
+            apiManager.getTopic(groupId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -142,9 +174,10 @@ class MainViewModel : ViewModel() {
                 })
         )
     }
-    fun getTopicId(topicId: String) {
+
+    fun getTopicId(topicId: String, groupId: String) {
         compositeDisposable.add(
-            apiManager.getTopicId(topicId)
+            apiManager.getTopicId(groupId, topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -155,15 +188,18 @@ class MainViewModel : ViewModel() {
                 })
         )
     }
-    fun getCreateTopic( name: String, descripton: String) {
+
+    fun getCreateTopic(name: String, descripton: String, groupId: String) {
         compositeDisposable.add(
-            apiManager.getCreateTopic( name, descripton)
+            apiManager.getCreateTopic(name, descripton, groupId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     createTopicData.value = it
-                    getTopicId(it.result.id)
-                    countTopicData.value= countTopicData.value?.plus(1)
+                    if (it.result != null) {
+                        getTopicId(it.result.id, groupId)
+                    }
+                    countTopicData.value = countTopicData.value?.plus(1)
                 }, {
                     createTopicData.value = null
 
@@ -172,17 +208,18 @@ class MainViewModel : ViewModel() {
     }
 
     fun getUpdateTopic(
-
         name: String,
-        description: String
+        description: String, groupId: String, topicId: String
     ) {
         compositeDisposable.add(
-            apiManager.getUpdateTopic( name, description)
+            apiManager.getUpdateTopic(name, description, groupId, topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     updateTopicData.value = it
-                    getTopicId(it.result.id)
+                    if (it.result != null) {
+                        getTopicId(it.result.id, groupId)
+                    }
                 }, {
                     updateTopicData.value = null
 
@@ -190,14 +227,14 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    fun getDeleteTopic() {
+    fun getDeleteTopic(groupId: String, topicId: String) {
         compositeDisposable.add(
-            apiManager.getDeleteTopic()
+            apiManager.getDeleteTopic(groupId, topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     deleteTopicData.value = it
-                    countTopicData.value= countTopicData.value?.minus(1)
+                    countTopicData.value = countTopicData.value?.minus(1)
                 }, {
                     deleteTopicData.value = null
 
@@ -206,9 +243,9 @@ class MainViewModel : ViewModel() {
     }
 
     //post
-    fun getPost() {
+    fun getPost(groupId: String, topicId: String) {
         compositeDisposable.add(
-            apiManager.getPost()
+            apiManager.getPost(groupId, topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -222,15 +259,20 @@ class MainViewModel : ViewModel() {
     }
 
     fun getCreatePost(
+        groupId: String, topicId: String,
         title: String,
         description: String
     ) {
         compositeDisposable.add(
-            apiManager.getCreatePost(title, description)
+            apiManager.getCreatePost(groupId, topicId, title, description)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     createPostData.value = it
+                    if (it.result != null) {
+                        getPostId( groupId,topicId, it.result.id)
+                    }
+
                     countPostData.value = countPostData.value?.plus(1)
                 }, {
                     createPostData.value = null
@@ -240,15 +282,24 @@ class MainViewModel : ViewModel() {
     }
 
     fun getUpdatePost(
+        groupId: String, topicId: String, postId: String,
         name: String,
         description: String
     ) {
         compositeDisposable.add(
-            apiManager.getUpdatePost(name, description)
+            apiManager.getUpdatePost(groupId, topicId, postId, name, description)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    updatePostData.value = it
+                    if (it.success) {
+                        updatePostData.value = it
+                        if(it.result!=null){
+                            getPostId( groupId,topicId, it.result.id)
+                        }
+                    } else {
+                        updatePostData.value = null
+                    }
+
                 }, {
                     updatePostData.value = null
 
@@ -256,9 +307,9 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    fun getDeletePost() {
+    fun getDeletePost(groupId: String, topicId: String, postId: String) {
         compositeDisposable.add(
-            apiManager.getDeletePost()
+            apiManager.getDeletePost(groupId, topicId, postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -273,9 +324,9 @@ class MainViewModel : ViewModel() {
     }
 
     //comment
-    fun getPostId() {
+    fun getPostId(groupId: String, topicId: String, postId: String) {
         compositeDisposable.add(
-            apiManager.getPostId()
+            apiManager.getPostId(groupId, topicId, postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -286,31 +337,50 @@ class MainViewModel : ViewModel() {
         )
     }
 
-    fun getComment() {
+    fun getComment(groupId: String, topicId: String, postId: String) {
         compositeDisposable.add(
-            apiManager.getComment()
+            apiManager.getComment(groupId, topicId, postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     commentData.value = it
-                    countCommentData.value= it.result.size
+                    countCommentData.value = it.result.size
                 }, {
                     commentData.value = null
                 })
         )
     }
 
-    fun getCreateComment(
+    fun getCommentId(
+        groupId: String, topicId: String, postId: String,
+        commentId: String
+    ) {
+        compositeDisposable.add(
+            apiManager.getCommentId(groupId, topicId, postId, commentId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    commentIdData.value = it
+                }, {
+                    commentIdData.value = null
+                })
+        )
+    }
 
+    fun getCreateComment(
+        groupId: String, topicId: String, postId: String,
         description: String
     ) {
         compositeDisposable.add(
-            apiManager.getCreateComment( description)
+            apiManager.getCreateComment(groupId, topicId, postId, description)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     createComment.value = it
-                    countCommentData.value= countCommentData.value?.plus(1)
+                    if(it.result!=null){
+                        getCommentId(groupId, topicId, postId, it.result.id)
+                    }
+                    countCommentData.value = countCommentData.value?.plus(1)
                 }, {
                     createComment.value = null
                 })
@@ -318,18 +388,21 @@ class MainViewModel : ViewModel() {
     }
 
     fun getUpdateComment(
-
-        description: String
+        groupId: String, topicId: String, postId: String,
+        commentId: String,
+        description: String,
     ) {
         compositeDisposable.add(
             apiManager.getUpdateComment(
-                description
+                groupId, topicId, postId, commentId, description
             )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     updateComment.value = it
-
+                    if(it.result!=null){
+                        getCommentId(groupId, topicId, postId, it.result.id)
+                    }
                 }, {
                     updateComment.value = null
                 })
@@ -337,18 +410,19 @@ class MainViewModel : ViewModel() {
     }
 
     fun getDeleteComment(
-
+        groupId: String, topicId: String, postId: String, commentId: String
     ) {
         compositeDisposable.add(
-            apiManager.getDeleteComment()
+            apiManager.getDeleteComment(groupId, topicId, postId, commentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     deleteComment.value = it
-                    countCommentData.value= countCommentData.value?.minus(1)
+                    countCommentData.value = countCommentData.value?.minus(1)
                 }, {
                     deleteComment.value = null
                 })
         )
     }
+
 }

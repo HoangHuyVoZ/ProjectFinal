@@ -9,6 +9,7 @@ data class commentData(
     val createdBy: String,
     val description: String,
     val flags: List<Any>,
+    @SerializedName("_id")
     val id: String,
     val isUpdated: Boolean,
     val postId: String,

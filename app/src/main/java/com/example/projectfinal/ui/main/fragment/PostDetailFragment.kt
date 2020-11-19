@@ -22,17 +22,25 @@ import com.example.projectfinal.viewmodel.MainViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.create_group_dialog.view.*
 import kotlinx.android.synthetic.main.create_topic_dialog.view.*
+import kotlinx.android.synthetic.main.fragment_feed_details.*
 import kotlinx.android.synthetic.main.fragment_post_detail.*
+import kotlinx.android.synthetic.main.fragment_post_detail.btnSend
+import kotlinx.android.synthetic.main.fragment_post_detail.edt_comment
 
 
-class PostDetailFragment : Fragment(), ClickItem {
+class PostDetailFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: CommentAdapter
     private var roleComment: Int? = 0
     private var nameTopic: String? = ""
+    private var idGroup: String? = ""
+    private var idTopic: String? = ""
+    private var idPost: String? = ""
+    private var idComment: String? = ""
     private var des: String? = ""
     private var position: Int? = 0
+    private var isUpdate: Int? = 0
     private var mAlertDialog: Dialog? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +53,9 @@ class PostDetailFragment : Fragment(), ClickItem {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         nameTopic = arguments?.getString("name").toString()
+        idGroup = arguments?.getString("group_id").toString()
+        idTopic = arguments?.getString("topic_id").toString()
+        idPost = arguments?.getString("post_id").toString()
 
         init()
         getPostID()
@@ -83,36 +94,25 @@ class PostDetailFragment : Fragment(), ClickItem {
                 diffResult.dispatchUpdatesTo(adapter)
             }
         })
+        mainViewModel.commentIdData.observe(viewLifecycleOwner, {
+            it.let {
+                if (it.success) {
+                    mAlertDialog?.dismiss()
+                    when (isUpdate) {
+                        1 -> {
+                            adapter.addItem(it.result[0])
+                            tv_no_comment.invisible()
+                            tv_comment_count.visible()
+                        }
+                        2 -> adapter.updateItem(it.result[0], position ?: 0)
+                    }
+                }
+            }
+        })
         mainViewModel.createComment.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
-                    val commentData = commentData(
-                        0, "", username ?: "", des ?: "", listOf(), it.result.id, false,
-                        postId ?: "", "active", "", 0
-                    )
-                    adapter.addItem(commentData)
-                    FancyToast.makeText(
-                        context, it.message, FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS, false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context, it.message, FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR, false
-                    ).show()
-                }
-            }
-            mainViewModel.getComment()
-            mainViewModel.getPostId()
-        })
-        mainViewModel.updateComment.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    val commentData = commentData(
-                        0, "", username ?: "", des ?: "", listOf(), it.result.id, true,
-                        postId ?: "", "active", "", 0
-                    )
-                    adapter.updateItem(commentData, position ?: 0)
+                    isUpdate = 1
                     FancyToast.makeText(
                         context, it.message, FancyToast.LENGTH_SHORT,
                         FancyToast.SUCCESS, false
@@ -126,10 +126,10 @@ class PostDetailFragment : Fragment(), ClickItem {
             }
 
         })
-        mainViewModel.deleteComment.observe(viewLifecycleOwner, {
-            if (it != null) {
+        mainViewModel.updateComment.observe(viewLifecycleOwner, {
+            it.let {
                 if (it.success) {
-                    adapter.remove(position ?: 0)
+                    isUpdate = 2
                     FancyToast.makeText(
                         context, it.message, FancyToast.LENGTH_SHORT,
                         FancyToast.SUCCESS, false
@@ -142,6 +142,25 @@ class PostDetailFragment : Fragment(), ClickItem {
                 }
             }
         })
+        mainViewModel.deleteComment.observe(viewLifecycleOwner,
+            {
+                it.let {
+                    if (it.success) {
+
+                        adapter.remove(position ?: 0)
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS, false
+                        ).show()
+
+                    } else {
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR, false
+                        ).show()
+                    }
+                }
+            })
     }
 
     private fun init() {
@@ -151,7 +170,34 @@ class PostDetailFragment : Fragment(), ClickItem {
         layoutManager = LinearLayoutManager(context)
         recyclerViewComment.setHasFixedSize(true)
         recyclerViewComment.layoutManager = layoutManager
-        adapter = CommentAdapter(this)
+        adapter = CommentAdapter { select, position, item ->
+            roleComment = select
+            this.position = position
+            idComment = item.id
+
+            when (roleComment) {
+                2 -> {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Warning !!!")
+                    builder.setMessage("Do you want remove this Comment?")
+                    builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+                        mainViewModel.getDeleteComment(
+                            idGroup ?: "",
+                            idTopic ?: "",
+                            idPost ?: "",
+                            item.id ?: ""
+                        )
+                    }
+                    builder.setNegativeButton(android.R.string.no) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    builder.show()
+                }
+                else -> {
+                    showDialog(item.description)
+                }
+            }
+        }
         recyclerViewComment.adapter = adapter
         recyclerViewComment.addItemDecoration(
             DividerItemDecoration(
@@ -163,6 +209,7 @@ class PostDetailFragment : Fragment(), ClickItem {
             if (edt_comment.text.toString().length >= 3) {
                 it.hideKeyboard()
                 mainViewModel.getCreateComment(
+                    idGroup ?: "", idTopic ?: "", idPost ?: "",
                     edt_comment.text.toString()
                 )
                 edt_comment.text.clear()
@@ -175,40 +222,10 @@ class PostDetailFragment : Fragment(), ClickItem {
     }
 
     private fun getPostID() {
-        if (topicId?.isNotEmpty()!!) {
-            mainViewModel.getPostId()
-            mainViewModel.getComment()
-        }
+        mainViewModel.getPostId(idGroup ?: "", idTopic ?: "", idPost ?: "")
+        mainViewModel.getComment(idGroup ?: "", idTopic ?: "", idPost ?: "")
     }
 
-    override fun onClickItem(
-        id: String,
-        role: Int,
-        name: String,
-        description: String,
-        positionn: Int
-    ) {
-        commentId = id
-        roleComment = role
-        position = positionn
-
-        showDialog(description)
-    }
-
-    override fun onRemoveClick(positionn: Int, id: String) {
-        position = positionn
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Warning !!!")
-        builder.setMessage("Do you want remove this Comment?")
-        builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-            mainViewModel.getDeleteComment()
-        }
-        builder.setNegativeButton(android.R.string.no) { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.show()
-
-    }
 
     private fun showDialog(description: String) {
         val dialog = LayoutInflater.from(context)
@@ -221,12 +238,13 @@ class PostDetailFragment : Fragment(), ClickItem {
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT
         mAlertDialog?.window?.attributes = layoutParams
         dialog.tv_title.text = "Update comment"
-        dialog.btnCancel_topic.setOnClickListener {
+        dialog.btnCancel.setOnClickListener {
             mAlertDialog?.dismiss()
         }
         dialog.btn_create_group.text = "update"
         dialog.edt_title_create.setText(description)
         dialog.btn_create_group.setOnClickListener {
+            it.hideKeyboard()
             des = dialog.edt_title_create.text.toString()
             when {
                 des?.isEmpty()!! -> {
@@ -234,7 +252,7 @@ class PostDetailFragment : Fragment(), ClickItem {
                 }
                 else -> {
                     mainViewModel.getUpdateComment(
-                        des ?: ""
+                        idGroup ?: "", idTopic ?: "", idPost ?: "", idComment ?: "", des ?: ""
                     )
                     mAlertDialog?.dismiss()
                 }

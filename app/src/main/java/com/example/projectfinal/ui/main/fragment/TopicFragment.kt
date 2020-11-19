@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -27,14 +28,16 @@ import kotlinx.android.synthetic.main.fragment_group.*
 import kotlinx.android.synthetic.main.fragment_topic.*
 
 
-class TopicFragment : Fragment(), ClickItem {
+@Suppress("DEPRECATION")
+class TopicFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: TopicAdapter
     private var roleGroup: Int? = 0
     private var isUpdate: Int? = 0
-    private var role: String? = ""
     private var nameGroup: String? = ""
+    private var idGroup: String? = ""
+    private var idTopic: String? = ""
     private var mAlertDialog: Dialog? = null
     private var title: String? = ""
     private var des: String? = ""
@@ -50,6 +53,8 @@ class TopicFragment : Fragment(), ClickItem {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         nameGroup = arguments?.getString("name").toString()
+        idGroup = arguments?.getString("group_id").toString()
+
         init()
         getTopic()
         data()
@@ -90,7 +95,7 @@ class TopicFragment : Fragment(), ClickItem {
             it.let {
                 if (it.success) {
                     mAlertDialog?.dismiss()
-                    when(isUpdate){
+                    when (isUpdate) {
                         1 -> adapter.addItem(it.result[0])
 
                         2 -> adapter.updateItem(it.result[0], position ?: 0)
@@ -100,86 +105,99 @@ class TopicFragment : Fragment(), ClickItem {
 
         })
         mainViewModel.createTopicData.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    mAlertDialog?.dismiss()
-                    isUpdate = 1
-                    FancyToast.makeText(
-                        context,
-                        "create topic successfully",
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS,
-                        false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context,
-                        it.message,
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR,
-                        false
-                    ).show()
-                }
-            }
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        isUpdate = 1
+                        mAlertDialog?.dismiss()
 
+                        FancyToast.makeText(
+                            context,
+                            "create topic successfully",
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS,
+                            false
+                        ).show()
+                    } else {
+                        FancyToast.makeText(
+                            context,
+                            it.message,
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR,
+                            false
+                        ).show()
+                    }
+                }
+                it.message = null
+            }
         })
         mainViewModel.updateTopicData.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    mAlertDialog?.dismiss()
-                    isUpdate = 2
-                    FancyToast.makeText(
-                        context,
-                        "Update topic successfully",
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS,
-                        false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context,
-                        it.message,
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR,
-                        false
-                    ).show()
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        isUpdate = 2
+                        mAlertDialog?.dismiss()
+                        FancyToast.makeText(
+                            context,
+                            "Update topic successfully",
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS,
+                            false
+                        ).show()
+                    } else {
+                        FancyToast.makeText(
+                            context,
+                            it.message,
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR,
+                            false
+                        ).show()
+                    }
                 }
+                it.message = null
             }
-
         })
         mainViewModel.deleteTopicData.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    adapter.remove(position?:0)
-                    FancyToast.makeText(
-                        context,
-                        "Delete topic successfully",
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS,
-                        false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context,
-                        it.message,
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR,
-                        false
-                    ).show()
-                }
-            }
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        adapter.remove(position ?: 0)
+                        FancyToast.makeText(
+                            context,
+                            "Delete topic successfully",
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS,
+                            false
+                        ).show()
 
+
+                    } else {
+                        FancyToast.makeText(
+                            context,
+                            it.message,
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR,
+                            false
+                        ).show()
+                    }
+                }
+                it.message = null
+            }
         })
     }
 
 
     private fun getTopic() {
-        mainViewModel.getTopic()
+        mainViewModel.getTopic(idGroup ?: "")
 
     }
 
     private fun init() {
-
+        val pref = requireContext().getSharedPreferences(
+            PREFS_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        val role = pref.getString(ROLE, "")
         tv_Topic.text = nameGroup
         if (role == MEMBER) {
             btnAdd_Topic.invisible()
@@ -192,7 +210,34 @@ class TopicFragment : Fragment(), ClickItem {
         layoutManager = LinearLayoutManager(context)
         recyclerViewTopic.setHasFixedSize(true)
         recyclerViewTopic.layoutManager = layoutManager
-        adapter = TopicAdapter(this)
+        adapter = TopicAdapter { select, position, item ->
+            this.position = position
+            idTopic = item.id
+            roleGroup = select
+
+            when (roleGroup) {
+                2 -> {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Warning !!!")
+                    builder.setMessage("Do you want remove this Topic?")
+                    builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+                        mainViewModel.getDeleteTopic(idGroup ?: "", idTopic ?: "")
+                    }
+                    builder.setNegativeButton(android.R.string.no) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    builder.show()
+                }
+                3 -> {
+                    val bundle =
+                        bundleOf("name" to item.name, "group_id" to idGroup, "topic_id" to idTopic)
+                    findNavController().navigate(R.id.action_topicFragment_to_postFragment, bundle)
+                }
+                else -> {
+                    showDialog(item.name, item.description)
+                }
+            }
+        }
         recyclerViewTopic.adapter = adapter
         btnAdd_Topic.setOnClickListener {
             roleGroup = 0
@@ -230,7 +275,7 @@ class TopicFragment : Fragment(), ClickItem {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getCreateTopic(title ?: "", des ?: "")
+                        mainViewModel.getCreateTopic(title ?: "", des ?: "", idGroup ?: "")
                     }
                 }
             }
@@ -253,48 +298,16 @@ class TopicFragment : Fragment(), ClickItem {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getUpdateTopic(title ?: "", des ?: "")
+                        mainViewModel.getUpdateTopic(
+                            title ?: "",
+                            des ?: "",
+                            idGroup ?: "",
+                            idTopic ?: ""
+                        )
                     }
                 }
             }
         }
-    }
-
-    override fun onClickItem(
-        id: String,
-        role: Int,
-        name: String,
-        description: String,
-        positionn: Int
-    ) {
-        topicId = id
-        roleGroup = role
-        position = positionn
-
-        when (role) {
-            4 -> {
-                val bundle = bundleOf("name" to name)
-                findNavController().navigate(R.id.action_topicFragment_to_postFragment, bundle)
-            }
-            else -> {
-                showDialog(name, description)
-            }
-        }
-    }
-
-    override fun onRemoveClick(positionn: Int, id: String) {
-        position = positionn
-        topicId = id
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Warning !!!")
-        builder.setMessage("Do you want remove this Topic?")
-        builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-            mainViewModel.getDeleteTopic()
-        }
-        builder.setNegativeButton(android.R.string.no) { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.show()
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.projectfinal.utils
 
-//const val BASE_URL="http:/192.168.20.249:4000/v1/api/"
+//const val BASE_URL = "http:/192.168.20.249:4000/v1/api/"
+
 const val BASE_URL="http:/192.168.1.110:4000/v1/api/"
 const val AUTHORIZATION = "Bearer "
 const val ACCESS_TOKEN = "ACCESS_TOKEN"
@@ -12,12 +13,4 @@ const val MEMBER = "member"
 const val MOD = "moderator"
 const val USERNAME = "username"
 const val USERNAME_ID = "username_id"
-var accessToken : String? = ""
-var groupId : String? = ""
-var topicId : String? = ""
-var postId : String? = ""
-var commentId : String? = ""
-var feedId : String? = ""
-var role: String? = ""
-var username: String? = ""
-var userId: String? = ""
+var accessToken: String? = ""

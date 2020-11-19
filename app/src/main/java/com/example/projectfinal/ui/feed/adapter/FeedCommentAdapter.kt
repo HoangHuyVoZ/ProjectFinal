@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
+import com.example.projectfinal.model.comment.commentData
 import com.example.projectfinal.model.feed.feedCommentData
 import com.example.projectfinal.utils.*
 
 import kotlinx.android.synthetic.main.item_comment.view.*
 
-class FeedCommentAdapter(private val onClickItem: ClickItem) :
+class FeedCommentAdapter(private var onClick: (select: Int, position: Int, item: feedCommentData) -> Unit) :
     RecyclerView.Adapter<FeedCommentAdapter.ViewHolder>() {
     private var list = ArrayList<feedCommentData>()
 
@@ -63,16 +64,14 @@ class FeedCommentAdapter(private val onClickItem: ClickItem) :
     override fun onBindViewHolder(holder: FeedCommentAdapter.ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-        val id = element.id
-        val des = element.description
         holder.itemView.txtEdit.setOnClickListener {
-            onClickItem.onClickItem(id, 1, "", des,position)
+            onClick.invoke(1, position, element)
         }
         holder.itemView.txtDelete.setOnClickListener {
-            onClickItem.onClickItem(id, 2, "", des,position)
+            onClick.invoke(2, position, element)
         }
         holder.itemView.txtDelete_admin.setOnClickListener {
-            onClickItem.onClickItem(id, 2, "", des,position)
+            onClick.invoke(2, position, element)
         }
 
     }
@@ -81,9 +80,30 @@ class FeedCommentAdapter(private val onClickItem: ClickItem) :
         return list.size
     }
 
+    fun remove(position: Int) {
+        list.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
     fun addList(items: MutableList<feedCommentData>) {
         list.clear()
         list.addAll(items)
+        notifyDataSetChanged()
+    }
+
+    fun getList(): ArrayList<feedCommentData> {
+        return list
+    }
+
+    fun addItem(item: feedCommentData) {
+        list.add(0, item)
+//        notifyItemInserted(0)
+        notifyDataSetChanged()
+
+    }
+
+    fun updateItem(item: feedCommentData, position: Int) {
+        list[position] = item
         notifyDataSetChanged()
     }
 

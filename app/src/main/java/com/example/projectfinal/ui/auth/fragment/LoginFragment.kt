@@ -55,13 +55,10 @@ class LoginFragment : Fragment() {
                     val editor = pref.edit()
                     editor.putBoolean(FIRST_TIME, false)
                     editor.putString(ACCESS_TOKEN,it.result.accessToken)
-                    editor.putString("ROLE",it.result.role)
-                    editor.putString("USER_ID",it.result.userId)
-                    accessToken= it.result.accessToken
-                    role =it.result.role
-                    userId=it.result.userId
+                    editor.putString(ROLE,it.result.role)
+                    editor.putString(USERNAME_ID,it.result.userId)
                     editor.apply()
-
+                    accessToken = it.result.accessToken
                     findNavController().navigate(R.id.action_loginFragment_to_helloFragment)
                     progressBar.invisible()
                 }else{

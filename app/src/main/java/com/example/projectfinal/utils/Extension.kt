@@ -12,7 +12,11 @@ import com.example.projectfinal.ui.main.HomeActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_home.*
 import java.util.regex.Pattern
-
+fun Context.getSharedPreference(prefsName: String, key: String): String {
+    getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+        ?.getString(key, "Value is empty!")?.let { return it }
+    return "Preference doesn't exist."
+}
 fun View.visible() {
     this.visibility = View.VISIBLE
 }

@@ -1,47 +1,42 @@
 package com.example.projectfinal.ui.feed
 
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.content.SharedPreferences
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
-import com.example.projectfinal.model.feed.ImageData
+import com.example.projectfinal.model.feed.feedData
 import com.example.projectfinal.ui.feed.adapter.FeedCreateAdapter
 import com.example.projectfinal.ui.main.HomeActivity
-import com.example.projectfinal.utils.ACCESS_TOKEN
-import com.example.projectfinal.utils.PREFS_NAME
 import com.example.projectfinal.utils.hideBottomNav
+import com.example.projectfinal.utils.hideKeyboard
+import com.example.projectfinal.utils.invisible
+import com.example.projectfinal.utils.visible
 import com.example.projectfinal.viewmodel.FeedViewModel
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.fragment_create.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class CreateFragment : Fragment() {
     private val RESULT_LOAD_IMAGE = 1
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: FeedCreateAdapter
-    private var imageData: ArrayList<ImageData>? = null
-
+    private var imageUri: ArrayList<Uri>? = null
+    private var update: String? = ""
+    private var feed: feedData? = null
+    private var image: ArrayList<String>? = arrayListOf()
 
     private val feedViewModel: FeedViewModel by lazy {
         ViewModelProvider(this)[FeedViewModel::class.java]
@@ -56,24 +51,70 @@ class CreateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? HomeActivity)?.hideBottomNav(true)
+        feed = arguments?.getParcelable("feed")
+        update = arguments?.getString("update")
+        image = feed?.attachments as ArrayList<String>?
+        imageUri = arrayListOf()
+        for (item in image ?: arrayListOf()) {
+            imageUri?.add(item.toUri())
+        }
+        Log.d("woo", imageUri.toString())
         init()
         data()
     }
 
     private fun data() {
-        feedViewModel.dataCreateFeed.observe(viewLifecycleOwner,{
-            if(it.success){
-                FancyToast.makeText(context,it.message,FancyToast.LENGTH_SHORT,FancyToast.SUCCESS,false).show()
-            }else{
-                FancyToast.makeText(context,it.message,FancyToast.LENGTH_SHORT,FancyToast.ERROR,false).show()
+        feedViewModel.dataCreateFeed.observe(viewLifecycleOwner, {
+            if (it.success) {
+                edt_status.text.clear()
+                adapter.clear()
+                progressBar.invisible()
+                FancyToast.makeText(
+                    context,
+                    it.message,
+                    FancyToast.LENGTH_SHORT,
+                    FancyToast.SUCCESS,
+                    false
+                ).show()
+            } else {
+                FancyToast.makeText(
+                    context,
+                    it.message,
+                    FancyToast.LENGTH_SHORT,
+                    FancyToast.ERROR,
+                    false
+                ).show()
 
+            }
+        })
+        feedViewModel.dataUpdateFeed.observe(viewLifecycleOwner, {
+            it.let {
+                if (it.success) {
+                    edt_status.text.clear()
+                    adapter.clear()
+                    progressBar.invisible()
+                    FancyToast.makeText(
+                        context,
+                        it.message,
+                        FancyToast.LENGTH_SHORT,
+                        FancyToast.SUCCESS,
+                        false
+                    ).show()
+                } else {
+                    FancyToast.makeText(
+                        context,
+                        it.message,
+                        FancyToast.LENGTH_SHORT,
+                        FancyToast.ERROR,
+                        false
+                    ).show()
+                }
             }
         })
     }
 
+    @SuppressLint("SetTextI18n")
     private fun init() {
-
-        imageData = arrayListOf()
         adapter = FeedCreateAdapter()
         layoutManager = LinearLayoutManager(
             context,
@@ -84,108 +125,94 @@ class CreateFragment : Fragment() {
         recycler_image.layoutManager = layoutManager
         recycler_image.adapter = adapter
 
-
+        progressBar.invisible()
+        if (update == "update") {
+            textView4.text = "Update feed"
+            edt_status.setText(feed?.description)
+            adapter.addList(imageUri ?: arrayListOf())
+        }
         tv_cancel.setOnClickListener {
+            it.hideKeyboard()
             findNavController().popBackStack()
 
         }
         tv_remove.setOnClickListener {
-            adapter.remove(imageData ?: arrayListOf())
+            adapter.remove(imageUri ?: arrayListOf())
             adapter.notifyDataSetChanged()
         }
         btn_add_image.setOnClickListener {
-            var intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "image/*"
-            startActivityForResult(intent, RESULT_LOAD_IMAGE);
+            startActivityForResult(intent, RESULT_LOAD_IMAGE)
         }
         tv_save.setOnClickListener {
-            var listURL : ArrayList<String> = arrayListOf()
+            progressBar.visible()
+            it.hideKeyboard()
             val edtStatus = edt_status.text.toString()
             val listImage = adapter.getList()
-            for(item in listImage){
-
-                if (item.image != null) {
-                    val fileName = UUID.randomUUID().toString() +".jpg"
-                    val refStorage = FirebaseStorage.getInstance().reference.child("images/$fileName")
-
-                    refStorage.putFile(item.image)
-                        .addOnSuccessListener(
-                            OnSuccessListener<UploadTask.TaskSnapshot> { taskSnapshot ->
-                                taskSnapshot.storage.downloadUrl.addOnSuccessListener {
-                                    listURL.add(it.toString())
-                                    Log.d("woo", listURL.toString())
-                                    if(listURL.size ==listImage.size){
-                                        feedViewModel.getCreatedFeed(edtStatus,listURL)
-                                    }
-                                }
-                            })
-
-                        ?.addOnFailureListener(OnFailureListener { e ->
-                            print(e.message)
-                        })
-
-
-                }
-            }
-
+            dataImage(edtStatus, listImage)
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK) {
+            imageUri?.removeAll(imageUri?: arrayListOf())
+
             if (data!!.clipData != null) {
                 val totalItemsSelected = data.clipData!!.itemCount
-                imageData = arrayListOf()
-//                imageData!!.clear()
                 for (i in 0 until totalItemsSelected) {
                     val fileUri = data.clipData!!.getItemAt(i).uri
-                    val fileName: String = getFileName(fileUri).toString()
-                    val image = ImageData(fileName, fileUri)
-                    imageData!!.add(image)
+                    imageUri!!.add(fileUri)
+
 
                 }
-                adapter.addList(imageData ?: arrayListOf())
 
-            }else if (data.data != null) {
+                adapter.addList(imageUri ?: arrayListOf())
+
+            } else if (data.data != null) {
                 val fileUri = data.data!!
-                val fileName: String = getFileName(fileUri).toString()
-                val image = ImageData(fileName, fileUri)
-                imageData!!.add(image)
-                adapter.addList(imageData ?: arrayListOf())
+                imageUri!!.add(fileUri)
+                adapter.addList(imageUri ?: arrayListOf())
 
             }
-
-
-//            Toast.makeText(context, "Selected Multiple Files", Toast.LENGTH_SHORT).show();
         }
 
 
     }
 
-    private fun getFileName(uri: Uri): String? {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor: Cursor? = context?.contentResolver?.query(uri, null, null, null, null)
-            cursor.use { cursor ->
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                }
-            }
-        }
-        if (result == null) {
-            result = uri.path
-            val cut = result?.lastIndexOf('/')
-            if (cut != -1) {
-                if (cut != null) {
-                    result = result?.substring(cut + 1)
-                }
-            }
-        }
-        return result
-    }
+    private fun dataImage(status: String, list: ArrayList<Uri>) {
+        val listURL: ArrayList<String>? = arrayListOf()
+        for (item in list) {
 
+            val fileName = UUID.randomUUID().toString() + ".jpg"
+            val refStorage = FirebaseStorage.getInstance().reference.child("images/$fileName")
+
+            refStorage.putFile(item)
+                .addOnSuccessListener { taskSnapshot ->
+                    taskSnapshot.storage.downloadUrl.addOnSuccessListener {
+                        listURL?.add(it.toString())
+                        Log.d("woo", listURL.toString())
+                        if (listURL?.size == list.size) {
+                            if (update == "update") {
+                                feedViewModel.getUpdateFeed(status, listURL, feed?.id!!)
+                            } else {
+                                feedViewModel.getCreateFeed(status, listURL)
+
+                            }
+                        }
+                    }
+                }
+
+                .addOnFailureListener { e ->
+                    print(e.message)
+                }
+        }
+
+
+    }
 
 }

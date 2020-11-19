@@ -10,7 +10,9 @@ import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_post.view.*
 
-class PostAdapter(private val onClickItem: ClickItem) :
+class PostAdapter(
+    private var onClick: (select: Int,position:Int,item:PostData)->Unit
+) :
     RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     private var list = ArrayList<PostData>()
 
@@ -66,16 +68,16 @@ class PostAdapter(private val onClickItem: ClickItem) :
         val title = element.title
         val des = element.description
         holder.itemView.txtEdit_post.setOnClickListener {
-            onClickItem.onClickItem(id, 2, title, des, position)
+                onClick.invoke(1,position,element)
         }
         holder.itemView.txtDelete_post.setOnClickListener {
-            onClickItem.onRemoveClick(position, id)
+            onClick.invoke(2,position,element)
         }
         holder.itemView.txtDelete_post_admin.setOnClickListener {
-            onClickItem.onRemoveClick(position, id)
+            onClick.invoke(2,position,element)
         }
         holder.itemView.post_rela.setOnClickListener {
-            onClickItem.onClickItem(id, 4, title, des, position)
+            onClick.invoke(3,position,element)
         }
     }
 
@@ -101,12 +103,12 @@ class PostAdapter(private val onClickItem: ClickItem) :
 
     fun updateItem(item: PostData, position: Int) {
         list[position] = item
-        notifyItemChanged(position)
+        notifyDataSetChanged()
     }
 
     fun remove(position: Int) {
         list.removeAt(position)
-        notifyItemRemoved(position)
+        notifyDataSetChanged()
     }
 
     fun clear() {

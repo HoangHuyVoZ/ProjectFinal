@@ -4,22 +4,16 @@ package com.example.projectfinal.ui.feed.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.projectfinal.R
-import com.example.projectfinal.model.feed.feedComment
-import com.example.projectfinal.model.feed.feedCommentData
 import com.example.projectfinal.model.feed.feedData
 import com.example.projectfinal.utils.*
-import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_feed.view.*
 
-class FeedAdapter(private val onClickItem: ClickItem) :
+class FeedAdapter(private var onClick: (select: Int, position: Int, item: feedData) -> Unit) :
     RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
     private var list = ArrayList<feedData>()
 
@@ -30,31 +24,31 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                 PREFS_NAME,
                 AppCompatActivity.MODE_PRIVATE
             )
-            val userId= pref.getString(USERNAME_ID,"")
+            val userId = pref.getString(USERNAME_ID, "")
             itemView.tv_user.text = list.createdBy
             itemView.tv_des.text = list.description
             itemView.tv_heart_count.text = list.countLike.toString()
-            itemView.tv_comment_count.text= list.countCommentFeed.toString()
-            var checkLike= false
-            for(item in list.flags){
-                if(item==userId){
+            itemView.tv_comment_count.text = list.countCommentFeed.toString()
+            var checkLike = false
+            for (item in list.flags) {
+                if (item == userId) {
                     itemView.heart.setImageResource(R.drawable.heart)
-                }else{
+                } else {
                     itemView.heart.setImageResource(R.drawable.heart_empty)
                 }
             }
 
             itemView.heart.setOnClickListener {
-               if(checkLike){
-                   checkLike= false
-                   itemView.heart.setImageResource(R.drawable.heart_empty)
-               }else{
-                   checkLike= true
-                   itemView.heart.setImageResource(R.drawable.heart)
-               }
+                if (checkLike) {
+                    checkLike = false
+                    itemView.heart.setImageResource(R.drawable.heart_empty)
+                } else {
+                    checkLike = true
+                    itemView.heart.setImageResource(R.drawable.heart)
+                }
             }
             when (list.attachments.size) {
-                0->{
+                0 -> {
                     itemView.image1_layout3.invisible()
                     itemView.image2_layout3.invisible()
                     itemView.image_layout2.invisible()
@@ -118,7 +112,7 @@ class FeedAdapter(private val onClickItem: ClickItem) :
                     itemView.image1_layout3.visible()
                     itemView.image2_layout3.visible()
                     itemView.tv_count_image.visible()
-                    itemView.tv_count_image.text="+ ${list.attachments.size-3}"
+                    itemView.tv_count_image.text = "+ ${list.attachments.size - 3}"
                     Glide.with(itemView)
                         .load(list.attachments[0])
                         .into(itemView.image_layout2)
@@ -150,21 +144,20 @@ class FeedAdapter(private val onClickItem: ClickItem) :
         val id = element.id
         val des = element.description
         holder.itemView.btn_more.setOnClickListener {
-            val popupMenu: PopupMenu = PopupMenu(holder.itemView.context,holder.itemView.btn_more)
-            popupMenu.menuInflater.inflate(R.menu.popup_menu,popupMenu.menu)
+            val popupMenu: PopupMenu = PopupMenu(holder.itemView.context, holder.itemView.btn_more)
+            popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
-                when(item.itemId) {
-                    R.id.Delete ->
-                        onClickItem.onClickItem(id, 2,"",des,position)
-                    R.id.CreateFeedFragment ->
-                        Toast.makeText(holder.itemView.context, "You Clicked : " + item.title, Toast.LENGTH_SHORT).show()
+                when (item.itemId) {
+                    R.id.Delete -> onClick.invoke(1, position, element)
+
+                    R.id.CreateFeedFragment -> onClick.invoke(2, position, element)
                 }
                 true
             })
             popupMenu.show()
         }
         holder.itemView.feed.setOnClickListener {
-            onClickItem.onClickItem(id, 4,"",des,position)
+            onClick.invoke(3, position, element)
         }
     }
 
@@ -177,10 +170,12 @@ class FeedAdapter(private val onClickItem: ClickItem) :
         list.addAll(items)
         notifyDataSetChanged()
     }
-    fun remove(position: Int){
+
+    fun remove(position: Int) {
         list.removeAt(position)
         notifyDataSetChanged()
     }
+
     fun clear() {
         list.clear()
         notifyDataSetChanged()

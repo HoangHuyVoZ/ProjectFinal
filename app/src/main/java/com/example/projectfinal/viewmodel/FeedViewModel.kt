@@ -1,47 +1,69 @@
 package com.example.projectfinal.viewmodel
 
-import androidx.lifecycle.LiveData
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.example.projectfinal.api.CallApi
-import com.example.projectfinal.model.feed.feed
-import com.example.projectfinal.model.feed.feedComment
+import com.example.projectfinal.model.BaseResponse
+import com.example.projectfinal.model.BaseResponseList
+import com.example.projectfinal.model.feed.createFeedData
+import com.example.projectfinal.model.feed.createFeedDataComment
 import com.example.projectfinal.model.feed.feedCommentData
+import com.example.projectfinal.model.feed.feedData
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
+import kotlin.collections.ArrayList
 
-class FeedViewModel : ViewModel() {
-    private val compositeDisposable = CompositeDisposable()
-    private val apiManager: CallApi by lazy { CallApi() }
-    var dataFeed: MutableLiveData<feed> = MutableLiveData<feed>()
-
-    //    var dataFeedLiveData : LiveData<feed> = Transformations.switchMap(dataFeed) {
+//    var dataFeedLiveData : LiveData<feed> = Transformations.switchMap(dataFeed) {
 //        val data = MutableLiveData<feed>()
 //        data.value = it
 //        data
 //    }
-
-    var dataCreateFeed: MutableLiveData<feed> = MutableLiveData<feed>()
-    var dataFeedID: MutableLiveData<feed> = MutableLiveData<feed>()
-    var dataComment: MutableLiveData<feedComment> = MutableLiveData<feedComment>()
-    var dataCreateComment: MutableLiveData<String> = MutableLiveData<String>()
-    var dataDeleteComment: MutableLiveData<String> = MutableLiveData<String>()
-    var dataUpdateComment: MutableLiveData<String> = MutableLiveData<String>()
+class FeedViewModel : ViewModel() {
+    private val compositeDisposable = CompositeDisposable()
+    private val apiManager: CallApi by lazy { CallApi() }
+    var dataFeed: MutableLiveData<BaseResponseList<feedData>> =
+        MutableLiveData<BaseResponseList<feedData>>()
+    var dataCreateFeed: MutableLiveData<BaseResponse<createFeedData>> =
+        MutableLiveData<BaseResponse<createFeedData>>()
+    var dataUpdateFeed: MutableLiveData<BaseResponse<createFeedData>> =
+        MutableLiveData<BaseResponse<createFeedData>>()
+    var dataFeedID: MutableLiveData<BaseResponseList<feedData>> =
+        MutableLiveData<BaseResponseList<feedData>>()
     var dataCountFeed: MutableLiveData<Int> = MutableLiveData<Int>()
-    var dataDeleteFeed: MutableLiveData<feed> = MutableLiveData<feed>()
+    var dataDeleteFeed: MutableLiveData<BaseResponseList<feedData>> =
+        MutableLiveData<BaseResponseList<feedData>>()
 
+    var dataFeedCommentID: MutableLiveData<BaseResponseList<feedCommentData>> =
+        MutableLiveData<BaseResponseList<feedCommentData>>()
+    var dataComment: MutableLiveData<BaseResponseList<feedCommentData>> =
+        MutableLiveData<BaseResponseList<feedCommentData>>()
+    var dataCreateComment: MutableLiveData<BaseResponse<createFeedDataComment>> =
+        MutableLiveData<BaseResponse<createFeedDataComment>>()
+    var dataDeleteComment: MutableLiveData<BaseResponse<createFeedDataComment>> =
+        MutableLiveData<BaseResponse<createFeedDataComment>>()
+    var dataUpdateComment: MutableLiveData<BaseResponse<createFeedDataComment>> =
+        MutableLiveData<BaseResponse<createFeedDataComment>>()
+    var dataCountComment: MutableLiveData<Int> = MutableLiveData<Int>()
+    var dataImage: MutableLiveData<ArrayList<String>> = MutableLiveData<ArrayList<String>>()
 
-    fun getCreatedFeed( description: String, attachments: ArrayList<String>) {
+    fun getCreateFeed(description: String, attachments: ArrayList<String>) {
         compositeDisposable.add(
-            apiManager.getCreateFeed( description, attachments)
+            apiManager.getCreateFeed(description, attachments)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.success) {
                         dataCreateFeed.value = it
                         dataCountFeed.value = dataCountFeed.value?.plus(1)
+                        getFeedID(it.result.id)
                     } else {
                         dataCreateFeed.value = it
 
@@ -52,23 +74,28 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
-
-    fun getFeedComment() {
+    fun getUpdateFeed(description: String, attachments: ArrayList<String>,feedId: String) {
         compositeDisposable.add(
-            apiManager.getFeedComment()
+            apiManager.getUpdateFeed(description,attachments,feedId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    dataComment.value = it
+                    if (it.success) {
+                        dataCreateFeed.value = it
+                        getFeedID(it.result.id)
+                    } else {
+                        dataCreateFeed.value = it
+
+                    }
+
                 }, {
-                    dataComment.value = null
+                    dataDeleteFeed.value = null
                 })
         )
     }
-
-    fun getDeleteFeed() {
+    fun getDeleteFeed(feedId: String) {
         compositeDisposable.add(
-            apiManager.getDeleteFeedID()
+            apiManager.getDeleteFeedID(feedId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -84,7 +111,6 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
-
     fun getFeed() {
         compositeDisposable.add(
             apiManager.getFeed()
@@ -100,9 +126,10 @@ class FeedViewModel : ViewModel() {
         )
     }
 
-    fun getFeedID() {
+
+    fun getFeedID(feedId: String) {
         compositeDisposable.add(
-            apiManager.getFeedID()
+            apiManager.getFeedID(feedId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -113,17 +140,43 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
-
-    fun getCreateFeed( description: String) {
+    fun getFeedComment(feedId: String) {
         compositeDisposable.add(
-            apiManager.getCreateFeedComment( description)
+            apiManager.getFeedComment(feedId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    dataComment.value = it
+                    dataCountComment.value = it.result.size
+                }, {
+                    dataComment.value = null
+                })
+        )
+    }
+    fun getFeedCommentId(feedId: String,commentId: String) {
+        compositeDisposable.add(
+            apiManager.getFeedCommentID(feedId,commentId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    dataFeedCommentID.value = it
+                }, {
+                    dataFeedCommentID.value = null
+                })
+        )
+    }
+    fun getCreateFeedComment(feedId: String, description: String) {
+        compositeDisposable.add(
+            apiManager.getCreateFeedComment(feedId, description)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.success) {
-                        dataCreateComment.value = it.message
+                        dataCreateComment.value = it
+                        dataCountComment.value = dataCountComment.value?.plus(1)
+                        getFeedCommentId(feedId,it.result.id)
                     } else {
-                        dataCreateComment.value = it.message
+                        dataCreateComment.value = it
                     }
                 }, {
                     dataCreateComment.value = null
@@ -132,16 +185,17 @@ class FeedViewModel : ViewModel() {
         )
     }
 
-    fun getDeleteFeedComment() {
+    fun getDeleteFeedComment(feedId: String, commentId: String) {
         compositeDisposable.add(
-            apiManager.getDeleteFeedComment()
+            apiManager.getDeleteFeedComment(feedId, commentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.success) {
-                        dataDeleteComment.value = it.message
+                        dataDeleteComment.value = it
+                        dataCountComment.value = dataCountComment.value?.minus(1)
                     } else {
-                        dataDeleteComment.value = it.message
+                        dataDeleteComment.value = it
                     }
                 }, {
                     dataDeleteComment.value = null
@@ -151,22 +205,44 @@ class FeedViewModel : ViewModel() {
     }
 
     fun getUpdateFeedComment(
+        feedId: String, commentId: String,
         description: String,
     ) {
         compositeDisposable.add(
-            apiManager.getUpdateFeedComment(description)
+            apiManager.getUpdateFeedComment(feedId, commentId, description)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.success) {
-                        dataUpdateComment.value = it.message
+                        dataUpdateComment.value = it
+                        getFeedCommentId(feedId,it.result.id)
+
                     } else {
-                        dataUpdateComment.value = it.message
+                        dataUpdateComment.value = it
                     }
                 }, {
                     dataUpdateComment.value = null
 
                 })
         )
+    }
+    fun getImage(file: Uri){
+        if (file != null) {
+            val fileName = UUID.randomUUID().toString() + ".jpg"
+            val refStorage = FirebaseStorage.getInstance().reference.child("images/$fileName")
+
+            refStorage.putFile(file)
+                .addOnSuccessListener(
+                    OnSuccessListener<UploadTask.TaskSnapshot> { taskSnapshot ->
+                        taskSnapshot.storage.downloadUrl.addOnSuccessListener {
+                            dataImage.value?.add(it.toString())
+                        }
+                    })
+                ?.addOnFailureListener(OnFailureListener { e ->
+                    print(e.message)
+                })
+
+
+        }
     }
 }

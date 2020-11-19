@@ -9,8 +9,11 @@ import com.example.projectfinal.R
 import com.example.projectfinal.model.group.Groupdata
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_group.view.*
+import kotlinx.coroutines.selects.select
 
-class GroupAdapter(private val onClickItem: ClickItem) :
+class GroupAdapter(
+    private var onClick: (select: Int, position: Int, item: Groupdata) -> Unit
+) :
     RecyclerView.Adapter<GroupAdapter.ViewHolder>() {
     private var list = ArrayList<Groupdata>()
 
@@ -56,16 +59,20 @@ class GroupAdapter(private val onClickItem: ClickItem) :
         val id = element.id
         val name = element.name
         holder.itemView.txtEdit.setOnClickListener {
-            onClickItem.onClickItem(id, 3, name, "", position)
+//            onClickItem.onClickItem(id, 3, name, "", position)
+            onClick.invoke(1, position, element)
         }
         holder.itemView.txtDelete.setOnClickListener {
-            onClickItem.onRemoveClick(position, id)
+//            onClickItem.onRemoveClick(position, id)
+            onClick.invoke(2, position, element)
         }
         holder.itemView.txtEdit_mod.setOnClickListener {
-            onClickItem.onClickItem(id, 3, name, "", position)
+//            onClickItem.onClickItem(id, 3, name, "", position)
+            onClick.invoke(1, position, element)
         }
         holder.itemView.item_group_re.setOnClickListener {
-            onClickItem.onClickItem(id, 4, name, "", position)
+//            onClickItem.onClickItem(id, 4, name, "", position)
+            onClick.invoke(3, position, element)
         }
     }
 
@@ -75,7 +82,7 @@ class GroupAdapter(private val onClickItem: ClickItem) :
 
     fun remove(position: Int) {
         list.removeAt(position)
-        notifyItemRemoved(position)
+        notifyDataSetChanged()
     }
 
     fun addList(items: MutableList<Groupdata>) {

@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +18,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.projectfinal.R
+import com.example.projectfinal.model.BaseResponse
+import com.example.projectfinal.model.group.CreateGroupData
 import com.example.projectfinal.model.group.Groupdata
 import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.main.adapter.GroupAdapter
@@ -26,7 +30,7 @@ import kotlinx.android.synthetic.main.create_group_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_group.*
 
 
-class GroupFragment : Fragment(), ClickItem {
+class GroupFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var adapter: GroupAdapter
@@ -34,8 +38,10 @@ class GroupFragment : Fragment(), ClickItem {
     private var position: Int? = 0
     private var mAlertDialog: Dialog? = null
     private var title: String? = ""
+    private var groupId: String? = ""
+    private var role: String? = ""
     private var isUpdate: Int? = 0
-
+    private var pref: SharedPreferences? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,7 +51,11 @@ class GroupFragment : Fragment(), ClickItem {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
+        pref = requireContext().getSharedPreferences(
+            PREFS_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
+        role = pref?.getString("ROLE", "")
         init()
         getGroup()
         dataGroup()
@@ -56,10 +66,7 @@ class GroupFragment : Fragment(), ClickItem {
     private fun dataGroup() {
         //getAll
         mainViewModel.countGroupData.observe(viewLifecycleOwner, {
-            it.let {
-                tv_countGroup.text = "Total: $it group"
-
-            }
+            it.let { tv_countGroup.text = "Total: $it group" }
         })
         mainViewModel.groupData.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -89,19 +96,23 @@ class GroupFragment : Fragment(), ClickItem {
         //Create
         mainViewModel.createData.observe(viewLifecycleOwner, {
             it.let {
-                if (it.success) {
-                    isUpdate = 1
-                    FancyToast.makeText(
-                        context, it.message, FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS, false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context, it.message, FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR, false
-                    ).show()
+                if (it.message != null) {
+                    if (it.success) {
+                        isUpdate = 1
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS, false
+                        ).show()
+                    } else {
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR, false
+                        ).show()
+                    }
                 }
+                it.message = null
             }
+
         })
         mainViewModel.groupDataId.observe(viewLifecycleOwner, {
             it.let {
@@ -118,38 +129,48 @@ class GroupFragment : Fragment(), ClickItem {
         })
         //delete
         mainViewModel.deleteGroupData.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    adapter.remove(position ?: 0)
-                    FancyToast.makeText(
-                        context, "Delete done !", FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS, false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context, "Delete fail !", FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS, false
-                    ).show()
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        adapter.remove(position ?: 0)
+
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS, false
+                        ).show()
+
+                    } else {
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS, false
+                        ).show()
+                    }
                 }
+                it.message = null
             }
         })
         //update
         mainViewModel.updateGroupData.observe(viewLifecycleOwner, {
             it.let {
-                if (it.success) {
-                    isUpdate = 2
-                    mAlertDialog?.dismiss()
+                if (it.message != null) {
+                    if (it.success) {
+                        isUpdate = 2
+                        mAlertDialog?.dismiss()
 
-                    FancyToast.makeText(
-                        context, "Update done !", FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS, false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context, "Update Fail !", FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR, false
-                    ).show()
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS, false
+                        ).show()
+
+
+                    } else {
+                        FancyToast.makeText(
+                            context, it.message, FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR, false
+                        ).show()
+                    }
                 }
+                it.message = null
             }
         })
     }
@@ -165,7 +186,40 @@ class GroupFragment : Fragment(), ClickItem {
         layoutManager = GridLayoutManager(context, 2)
         recyclerViewGroup.setHasFixedSize(true)
         recyclerViewGroup.layoutManager = layoutManager
-        adapter = GroupAdapter(this)
+        adapter = GroupAdapter {
+                select,
+                position,
+                item,
+            ->
+            groupId = item.id
+            roleGroup = select
+            this.position = position
+            val name = item.name
+            when (roleGroup) {
+                2 -> {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Warning !!!")
+                    builder.setMessage("Do you want remove this group?")
+                    builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+                        mainViewModel.getDeleteGroup(groupId ?: "")
+                    }
+                    builder.setNegativeButton(android.R.string.no) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    builder.show()
+                }
+                3 -> {
+                    val bundle = bundleOf("group_id" to item.id, "name" to name)
+                    findNavController().navigate(
+                        R.id.action_groupFragment_to_topicFragment,
+                        bundle
+                    )
+                }
+                else -> {
+                    showDialog(name, item.id)
+                }
+            }
+        }
         recyclerViewGroup.adapter = adapter
 
         if (role == ADMIN) {
@@ -176,11 +230,11 @@ class GroupFragment : Fragment(), ClickItem {
 
         btnAdd_Group.setOnClickListener {
             roleGroup = 0
-            showDialog("")
+            showDialog("", "")
         }
     }
 
-    private fun showDialog(titleGroup: String) {
+    private fun showDialog(titleGroup: String, groupId: String) {
         val dialog = LayoutInflater.from(context)
             .inflate(R.layout.create_group_dialog, null)
         val mBuilder = AlertDialog.Builder(context).setView(dialog)
@@ -214,7 +268,7 @@ class GroupFragment : Fragment(), ClickItem {
                 if (title?.isEmpty()!!) {
                     dialog.edt_title_create.error = "You have not entered a title"
                 } else {
-                    mainViewModel.getUpdateGroup(title ?: "")
+                    mainViewModel.getUpdateGroup(groupId ?: "", title ?: "")
 
                 }
             }
@@ -222,42 +276,5 @@ class GroupFragment : Fragment(), ClickItem {
 
     }
 
-    override fun onClickItem(
-        id: String,
-        role: Int,
-        name: String,
-        des: String,
-        positionn: Int
-    ) {
-        groupId = id
-        roleGroup = role
-        position = positionn
-        when (role) {
-            4 -> {
-
-                val bundle = bundleOf("group_id" to id, "name" to name)
-                findNavController().navigate(R.id.action_groupFragment_to_topicFragment, bundle)
-            }
-            else -> {
-                showDialog(name)
-            }
-        }
-    }
-
-    override fun onRemoveClick(positionItem: Int, id: String) {
-        position = positionItem
-        groupId = id
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Warning !!!")
-        builder.setMessage("Do you want remove this group?")
-        builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-            mainViewModel.getDeleteGroup()
-
-        }
-        builder.setNegativeButton(android.R.string.no) { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.show()
-    }
 
 }

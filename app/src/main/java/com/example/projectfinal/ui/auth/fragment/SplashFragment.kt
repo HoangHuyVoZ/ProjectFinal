@@ -34,14 +34,13 @@ class SplashFragment : Fragment() {
                 AppCompatActivity.MODE_PRIVATE
             )
             val fistTime = pref.getBoolean(FIRST_TIME, true)
-            accessToken = pref.getString(ACCESS_TOKEN, "")
-            username = pref.getString(USERNAME, "...")
-            role = pref.getString("ROLE", "")
+            val name = pref.getString(USERNAME, "...")
+            accessToken= pref.getString(ACCESS_TOKEN,"")
             if (fistTime) {
                 findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
             } else {
                 tv_username_splash.visible()
-                tv_username_splash.text = "Hi, \n$username"
+                tv_username_splash.text = "Hi, \n$name"
                 val intent = Intent(context, HomeActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)

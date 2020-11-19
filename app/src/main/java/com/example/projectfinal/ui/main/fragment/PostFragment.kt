@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -18,8 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
-import com.example.projectfinal.model.post.CreatePost
-import com.example.projectfinal.model.post.CreatePostData
 import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.main.adapter.PostAdapter
@@ -30,17 +26,21 @@ import kotlinx.android.synthetic.main.create_topic_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_post.*
 
 
-class PostFragment : Fragment(), ClickItem {
+@Suppress("DEPRECATION", "NAME_SHADOWING")
+class PostFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: PostAdapter
-    private var roleTopic:Int?  = 0
-    private var position :Int? = 0
-    private var nameTopic :String? = ""
+    private var roleTopic: Int? = 0
+    private var position: Int? = 0
+    private var nameTopic: String? = ""
+    private var idGroup: String? = ""
+    private var idTopic: String? = ""
+    private var idPost: String? = ""
     private var mAlertDialog: Dialog? = null
-    private var title :String? = ""
-    private var des :String? = ""
-
+    private var title: String? = ""
+    private var des: String? = ""
+    private var isUpdate: Int? = 0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -53,13 +53,17 @@ class PostFragment : Fragment(), ClickItem {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         nameTopic = arguments?.getString("name").toString()
+        idGroup = arguments?.getString("group_id").toString()
+        idTopic = arguments?.getString("topic_id").toString()
+
         init()
         getPost()
         dataPost()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun dataPost() {
-        mainViewModel.countPostData.observe(viewLifecycleOwner,{
+        mainViewModel.countPostData.observe(viewLifecycleOwner, {
             tv_countPost.text = "Total: $it post"
         })
         mainViewModel.postData.observe(viewLifecycleOwner, {
@@ -85,88 +89,112 @@ class PostFragment : Fragment(), ClickItem {
                 progressBar_Post.invisible()
             }
         })
-        mainViewModel.createPostData.observe(viewLifecycleOwner, { it ->
-            if (it != null) {
-                if (it.success && it.message.isNotEmpty()) {
+        mainViewModel.postIdData.observe(viewLifecycleOwner, {
+            it.let {
+                if (it.success) {
                     mAlertDialog?.dismiss()
-                    val postData= PostData(arrayListOf(),0,0,"",username?:"",des?:"",it.result.id,title?:"")
-                    adapter.addItem(postData)
-                    FancyToast.makeText(
-                        context,
-                        "Create post successfully",
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS,
-                        false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context,
-                        it.message,
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR,
-                        false
-                    ).show()
+                    when (isUpdate) {
+                        1 -> adapter.addItem(it.result[0])
+
+                        2 -> adapter.updateItem(it.result[0], position ?: 0)
+                    }
                 }
             }
         })
-        mainViewModel.updatePostData.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    mAlertDialog?.dismiss()
-                    val postData= PostData(arrayListOf(),0,0,"",username?:"",des?:"",it.result.id,title?:"")
-                    adapter.updateItem(postData,position?:0)
-                    FancyToast.makeText(
-                        context,
-                        "Create post successfully",
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS,
-                        false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context,
-                        it.message,
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR,
-                        false
-                    ).show()
+        mainViewModel.createPostData.observe(viewLifecycleOwner, {
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        mAlertDialog?.dismiss()
+                        isUpdate = 1
+
+                        FancyToast.makeText(
+                            context,
+                            "Create post successfully",
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS,
+                            false
+                        ).show()
+
+
+                    } else {
+                        FancyToast.makeText(
+                            context,
+                            it.message,
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR,
+                            false
+                        ).show()
+                    }
                 }
+                it.message = null
             }
+
+        })
+        mainViewModel.updatePostData.observe(viewLifecycleOwner, {
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        isUpdate = 2
+                        mAlertDialog?.dismiss()
+                        FancyToast.makeText(
+                            context,
+                            "Update post successfully",
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS,
+                            false
+                        ).show()
+                    } else {
+                        FancyToast.makeText(
+                            context,
+                            it.message,
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR,
+                            false
+                        ).show()
+                    }
+                }
+                it.message = null
+            }
+
 
         })
         mainViewModel.deletePostData.observe(viewLifecycleOwner, {
-            if (it != null) {
-                if (it.success) {
-                    adapter.remove(position?:0)
-                    FancyToast.makeText(
-                        context,
-                        "Delete post successfully",
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.SUCCESS,
-                        false
-                    ).show()
-                } else {
-                    FancyToast.makeText(
-                        context,
-                        it.message,
-                        FancyToast.LENGTH_SHORT,
-                        FancyToast.ERROR,
-                        false
-                    ).show()
+            it.let {
+                if (it.message != null) {
+                    if (it.success) {
+                        adapter.remove(position ?: 0)
+
+                        FancyToast.makeText(
+                            context,
+                            "Delete post successfully",
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.SUCCESS,
+                            false
+                        ).show()
+
+                    } else {
+                        FancyToast.makeText(
+                            context,
+                            it.message,
+                            FancyToast.LENGTH_SHORT,
+                            FancyToast.ERROR,
+                            false
+                        ).show()
+                    }
                 }
+                it.message = null
             }
-
-
         })
     }
 
     private fun getPost() {
-        if (topicId?.isNotEmpty()!!) {
-            mainViewModel.getPost()
-        }
+        mainViewModel.getPost(idGroup ?: "", idTopic ?: "")
+
     }
 
     private fun init() {
+
         tv_Post.text = nameTopic
 
         tv_token_post.invisible()
@@ -175,7 +203,42 @@ class PostFragment : Fragment(), ClickItem {
         layoutManager = LinearLayoutManager(context)
         recyclerViewPost.setHasFixedSize(true)
         recyclerViewPost.layoutManager = layoutManager
-        adapter = PostAdapter(this)
+        adapter = PostAdapter { select, position, item ->
+            roleTopic = select
+            this.position = position
+            idPost = item.id
+
+            when (roleTopic) {
+                2 -> {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Warning !!!")
+                    builder.setMessage("Do you want remove this Post?")
+                    builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+                        mainViewModel.getDeletePost(idGroup ?: "", idTopic ?: "", idPost ?: "")
+                    }
+                    builder.setNegativeButton(android.R.string.no) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    builder.show()
+                }
+                3 -> {
+
+                    val bundle = bundleOf(
+                        "title" to item.title,
+                        "group_id" to idGroup,
+                        "topic_id" to idTopic,
+                        "post_id" to idPost
+                    )
+                    findNavController().navigate(
+                        R.id.action_postFragment_to_postDetailFragment,
+                        bundle
+                    )
+                }
+                else -> {
+                    showDialog(item.title, item.description)
+                }
+            }
+        }
         recyclerViewPost.adapter = adapter
         btnAdd_Post.setOnClickListener {
             roleTopic = 0
@@ -191,7 +254,7 @@ class PostFragment : Fragment(), ClickItem {
         val dialog = LayoutInflater.from(context)
             .inflate(R.layout.create_topic_dialog, null)
         val mBuilder = AlertDialog.Builder(context).setView(dialog)
-         mAlertDialog = mBuilder.show()
+        mAlertDialog = mBuilder.show()
         val layoutParams = WindowManager.LayoutParams()
         layoutParams.copyFrom(mAlertDialog?.window?.attributes)
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -203,9 +266,9 @@ class PostFragment : Fragment(), ClickItem {
                 mAlertDialog?.dismiss()
             }
             dialog.btn_create_topic.setOnClickListener {
-                 title = dialog.edt_title_topic.text.toString()
-                 des = dialog.edt_des_topic.text.toString()
-
+                title = dialog.edt_title_topic.text.toString()
+                des = dialog.edt_des_topic.text.toString()
+                it.hideKeyboard()
                 when {
                     title?.isEmpty()!! -> {
                         dialog.edt_title_topic.error = "You have not entered a title"
@@ -214,7 +277,12 @@ class PostFragment : Fragment(), ClickItem {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getCreatePost( title?:"", des?:"")
+                        mainViewModel.getCreatePost(
+                            idGroup ?: "",
+                            idTopic ?: "",
+                            title ?: "",
+                            des ?: ""
+                        )
                     }
                 }
             }
@@ -227,8 +295,9 @@ class PostFragment : Fragment(), ClickItem {
             dialog.edt_des_topic.setText(description)
             dialog.edt_title_topic.setText(name)
             dialog.btn_create_topic.setOnClickListener {
-                 title = dialog.edt_title_topic.text.toString()
-                 des = dialog.edt_des_topic.text.toString()
+                title = dialog.edt_title_topic.text.toString()
+                des = dialog.edt_des_topic.text.toString()
+                it.hideKeyboard()
                 when {
                     title?.isEmpty()!! -> {
                         dialog.edt_title_topic.error = "You have not entered a title"
@@ -238,53 +307,15 @@ class PostFragment : Fragment(), ClickItem {
                     }
                     else -> {
                         mainViewModel.getUpdatePost(
-                            title?:"",
-                            des?:""
+                            idGroup ?: "", idTopic ?: "", idPost ?: "",
+                            title ?: "",
+                            des ?: ""
                         )
                         mAlertDialog?.dismiss()
                     }
                 }
             }
         }
-    }
-
-    override fun onClickItem(
-        id: String,
-        role: Int,
-        name: String,
-        description: String,
-        positionn: Int
-    ) {
-        postId = id
-        roleTopic = role
-        position= positionn
-        when (role) {
-            4 -> {
-
-                val bundle = bundleOf(
-                    "name" to name
-                )
-                findNavController().navigate(R.id.action_postFragment_to_postDetailFragment, bundle)
-            }
-            else -> {
-                showDialog(name, description)
-            }
-        }
-    }
-
-    override fun onRemoveClick(positionn: Int, id: String) {
-        position= positionn
-        postId=id
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Warning !!!")
-        builder.setMessage("Do you want remove this Post?")
-        builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-            mainViewModel.getDeletePost()
-        }
-        builder.setNegativeButton(android.R.string.no) { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.show()
     }
 
 

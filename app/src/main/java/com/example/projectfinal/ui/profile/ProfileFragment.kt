@@ -30,9 +30,13 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        val pref = requireContext().getSharedPreferences(
+            PREFS_NAME,
+            AppCompatActivity.MODE_PRIVATE
+        )
 
-        tv_username_pro.text = username
-        tv_role_pro.text = role
+        tv_username_pro.text = pref.getString(USERNAME,"")
+        tv_role_pro.text =  pref.getString(ROLE,"")
 
         logout.setOnClickListener {
             context?.let { it -> firstTime(it,true) }

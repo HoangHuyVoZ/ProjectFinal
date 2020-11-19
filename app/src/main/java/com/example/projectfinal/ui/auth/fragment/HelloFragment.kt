@@ -43,7 +43,6 @@ class HelloFragment : Fragment() {
                     val editor = pref.edit()
                     editor.putString(USERNAME, it.result.displayName)
                     editor.apply()
-                    username= it.result.displayName
 
                     Handler().postDelayed({
                        val intent= Intent(context, HomeActivity::class.java)

@@ -8,10 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
 import com.example.projectfinal.model.comment.commentData
+import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_comment.view.*
 
-class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
+class CommentAdapter(private var onClick: (select: Int, position: Int, item: commentData) -> Unit) :
+    RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
     private var list = ArrayList<commentData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -28,15 +30,16 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
                 AppCompatActivity.MODE_PRIVATE
             )
             val role = pref.getString(ROLE, "")
-            val username= pref.getString(USERNAME,"")
+            val username = pref.getString(USERNAME, "")
             when {
+                username == list.createdBy -> {
+                    itemView.txtDelete_admin.gone()
+                }
                 role == ADMIN -> {
                     itemView.txtDelete.gone()
                     itemView.txtEdit.gone()
                 }
-                username==list.createdBy -> {
-                    itemView.txtDelete_admin.gone()
-                }
+
                 else -> {
                     itemView.swipe.setLockDrag(true)
 
@@ -59,16 +62,14 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-        val id = element.id
-        val des = element.description
         holder.itemView.txtEdit.setOnClickListener {
-            onClickItem.onClickItem(id, 1,"",des,position)
+                onClick.invoke(1,position,element)
         }
         holder.itemView.txtDelete.setOnClickListener {
-            onClickItem.onRemoveClick(position,id)
+            onClick.invoke(2,position,element)
         }
         holder.itemView.txtDelete_admin.setOnClickListener {
-            onClickItem.onRemoveClick(position,id)
+            onClick.invoke(2,position,element)
         }
     }
 
@@ -86,17 +87,21 @@ class CommentAdapter(private val onClickItem: ClickItem) : RecyclerView.Adapter<
         list.addAll(items)
         notifyDataSetChanged()
     }
-    fun getList(): ArrayList<commentData>{
+
+    fun getList(): ArrayList<commentData> {
         return list
     }
+
     fun addItem(item: commentData) {
         list.add(0, item)
-        notifyItemInserted(0)
+//        notifyItemInserted(0)
+        notifyDataSetChanged()
+
     }
 
     fun updateItem(item: commentData, position: Int) {
         list[position] = item
-        notifyItemChanged(position)
+        notifyDataSetChanged()
     }
 
     fun clear() {

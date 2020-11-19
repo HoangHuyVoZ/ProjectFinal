@@ -8,16 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.projectfinal.R
 import com.example.projectfinal.model.feed.ImageData
-import com.example.projectfinal.utils.ClickItem
 import kotlinx.android.synthetic.main.item_image.view.*
 
 class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
-    private var list = ArrayList<ImageData>()
+    private var list = ArrayList<Uri>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(list: ImageData) {
+        fun bind(list: Uri) {
             Glide.with(itemView)
-                .load(list.image)
+                .load(list)
                 .into(itemView.image_feed)
         }
     }
@@ -38,8 +37,6 @@ class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: FeedCreateAdapter.ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-        val position = position
-        val name = element.name
 //        onClick.onClickItem("",position,name,"")
         holder.itemView.btn_del.setOnClickListener {
             list.removeAt(position)
@@ -51,23 +48,28 @@ class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
         return list.size
     }
 
-    fun addList(items: ArrayList<ImageData>) {
+    fun addList(items: ArrayList<Uri>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
 
-    fun remove(items: ArrayList<ImageData>) {
+    fun remove(items: ArrayList<Uri>) {
         list.removeAll(items)
         notifyDataSetChanged()
     }
 
-    fun getList(): ArrayList<ImageData> {
-        val checkList = arrayListOf<ImageData>()
+
+    fun getList(): ArrayList<Uri> {
+        val checkList = arrayListOf<Uri>()
         for (item in list) {
             checkList.add(item)
 
         }
         return checkList
+    }
+    fun clear(){
+        list.clear()
+        notifyDataSetChanged()
     }
 }

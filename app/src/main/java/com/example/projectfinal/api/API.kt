@@ -1,17 +1,22 @@
 package com.example.projectfinal.api
 
-import com.example.projectfinal.model.group.CreateGroup
-import com.example.projectfinal.model.group.Group
-import com.example.projectfinal.model.post.Post
-import com.example.projectfinal.model.signup.Signup
+import com.example.projectfinal.model.BaseResponse
+import com.example.projectfinal.model.BaseResponseList
 import com.example.projectfinal.model.topic.*
-import com.example.projectfinal.model.comment.CreateComment
-import com.example.projectfinal.model.user.User
-import com.example.projectfinal.model.comment.comment
-import com.example.projectfinal.model.feed.feed
-import com.example.projectfinal.model.feed.feedComment
-import com.example.projectfinal.model.login.Login
-import com.example.projectfinal.model.post.CreatePost
+import com.example.projectfinal.model.comment.CreateCommentData
+import com.example.projectfinal.model.comment.commentData
+import com.example.projectfinal.model.feed.createFeedData
+import com.example.projectfinal.model.feed.createFeedDataComment
+import com.example.projectfinal.model.feed.feedCommentData
+import com.example.projectfinal.model.feed.feedData
+import com.example.projectfinal.model.group.CreateGroupData
+import com.example.projectfinal.model.group.Groupdata
+import com.example.projectfinal.model.group.UpdateGroupData
+import com.example.projectfinal.model.login.LoginData
+import com.example.projectfinal.model.post.CreatePostData
+import com.example.projectfinal.model.post.PostData
+import com.example.projectfinal.model.signup.SignUpData
+import com.example.projectfinal.model.user.UserData
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -22,7 +27,7 @@ interface API {
     fun login(
         @Field("email") username: String,
         @Field("password") password: String
-    ): Call<Login>
+    ): Call<BaseResponse<LoginData>>
 
     @FormUrlEncoded
     @POST("signup")
@@ -31,217 +36,197 @@ interface API {
         @Field("password") password: String,
         @Field("display_name") display_name: String,
         @Field("gender") gender: String
-    ): Call<Signup>
+    ): Call<BaseResponse<SignUpData>>
     //group
     @GET("group")
     fun getGroups(
-        @Header("Authorization") authorization: String
-    ): Call<Group>
+    ): Call<BaseResponseList<Groupdata>>
     @GET("group/{group_id}")
     fun getGroupId(
-        @Header("Authorization") authorization: String,
         @Path("group_id")group_id :String?,
-    ): Call<Group>
+    ): Call<BaseResponseList<Groupdata>>
     @FormUrlEncoded
     @POST("group")
     fun getCreateGroup(
-        @Header("Authorization") authorization: String,
         @Field("name")name: String
-    ): Call<CreateGroup>
+    ): Call<BaseResponse<CreateGroupData>>
 
     @FormUrlEncoded
     @PATCH("group/{group_id}")
     fun getUpdateGroup(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Field("name")name: String
-    ):Call<CreateGroup>
+    ):Call<BaseResponse<UpdateGroupData>>
 
     @DELETE("group/{group_id}")
     fun getDeleteGroup(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
-    ):Call<CreateGroup>
+    ):Call<BaseResponse<CreateGroupData>>
 //topic
     @GET("group/{group_id}/topic")
     fun getTopic(
-      @Header("Authorization")authorization: String,
       @Path("group_id")group_id :String?,
-      ): Call<Topic>
+      ): Call<BaseResponseList<TopicData>>
     @GET("group/{group_id}/topic/{topic_id}")
     fun getTopic(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
-    ): Call<Topic>
+    ): Call<BaseResponseList<TopicData>>
     @FormUrlEncoded
     @POST("group/{group_id}/topic")
     fun getCreateTopic(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Field("name")name: String,
         @Field("description")description: String,
-    ): Call<CreateTopic>
+    ): Call<BaseResponse<CreateTopicData>>
 
     @FormUrlEncoded
     @PATCH("group/{group_id}/topic/{topic_id}")
     fun getUpdateTopic(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Field("name")name: String,
         @Field("description")description: String
-    ):Call<updateTopic>
+    ):Call<BaseResponse<UpdateTopicData>>
 
     @DELETE("group/{group_id}/topic/{topic_id}")
     fun getDeleteTopic(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id :String?,
-    ):Call<CreateTopic>
+    ):Call<BaseResponse<CreateTopicData>>
     //
     // user
     @GET("info")
     fun getUserInfo(
-        @Header("Authorization")authorization: String,
-        ): Call<User>
+        ): Call<BaseResponse<UserData>>
     @FormUrlEncoded
     @PATCH("info")
     fun getUserChangePass(
-        @Header("Authorization")authorization: String,
         @Field("oldpassword")old: String,
         @Field("newpassword")new: String,
         @Field("renewpassword")renew: String,
-    ): Call<User>
+    ): Call<BaseResponse<UserData>>
     //post
     @GET("group/{group_id}/topic/{topic_id}/post")
     fun getPost(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
-    ): Call<Post>
+    ): Call<BaseResponseList<PostData>>
     @FormUrlEncoded
     @POST("group/{group_id}/topic/{topic_id}/post")
     fun getCreatePost(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Field("title")title: String,
         @Field("description")description: String
-    ): Call<CreatePost>
+    ): Call<BaseResponse<CreatePostData>>
     @FormUrlEncoded
     @PATCH("group/{group_id}/topic/{topic_id}/post/{post_id}")
     fun getUpdatePost(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
         @Field("title")name: String,
         @Field("description")description: String
-    ):Call<CreatePost>
+    ):Call<BaseResponse<CreatePostData>>
     @DELETE("group/{group_id}/topic/{topic_id}/post/{post_id}")
     fun getDeletePost(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
-    ):Call<CreatePost>
+    ):Call<BaseResponse<CreatePostData>>
     //comment
     @GET("group/{group_id}/topic/{topic_id}/post/{post_id}")
     fun getPostId(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
-    ): Call<Post>
+    ): Call<BaseResponseList<PostData>>
     @GET("group/{group_id}/topic/{topic_id}/post/{post_id}/comment")
     fun getComment(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
-    ): Call<comment>
+    ): Call<BaseResponseList<commentData>>
+    @GET("group/{group_id}/topic/{topic_id}/post/{post_id}/comment/{comment_id}")
+    fun getCommentId(
+        @Path("group_id")group_id :String?,
+        @Path("topic_id")topic_id: String?,
+        @Path("post_id")post_id: String?,
+        @Path("comment_id")comment_id: String?,
+    ): Call<BaseResponseList<commentData>>
     @FormUrlEncoded
     @POST("group/{group_id}/topic/{topic_id}/post/{post_id}/comment")
     fun getCreateComment(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
         @Field("description")description: String
-    ): Call<CreateComment>
+    ): Call<BaseResponse<CreateCommentData>>
     @FormUrlEncoded
     @PATCH("group/{group_id}/topic/{topic_id}/post/{post_id}/comment/{comment_id}")
     fun getUpdateComment(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
         @Path("comment_id")comment_id: String?,
         @Field("description")description: String
-    ): Call<CreateComment>
+    ): Call<BaseResponse<CreateCommentData>>
     @DELETE("group/{group_id}/topic/{topic_id}/post/{post_id}/comment/{comment_id}")
     fun getDeleteComment(
-        @Header("Authorization")authorization: String,
         @Path("group_id")group_id :String?,
         @Path("topic_id")topic_id: String?,
         @Path("post_id")post_id: String?,
-        @Path("comment_id")comment_id: String?): Call<CreateComment>
+        @Path("comment_id")comment_id: String?): Call<BaseResponse<CreateCommentData>>
     @GET("feed")
     fun getFeed(
-        @Header("Authorization")authorization: String,
-    ): Call<feed>
+    ): Call<BaseResponseList<feedData>>
     @GET("feed/{feed_id}")
     fun getFeedID(
-        @Header("Authorization")authorization: String,
         @Path("feed_id")feed_id: String?,
-        ): Call<feed>
+        ): Call<BaseResponseList<feedData>>
     @DELETE("feed/{feed_id}")
     fun getDeleteFeedID(
-        @Header("Authorization")authorization: String,
         @Path("feed_id")feed_id: String?,
-    ): Call<feed>
-    @FormUrlEncoded
-    @PATCH("feed/{feed_id}/addlike")
-    fun getAddLikeFeed(
-        @Header("Authorization")authorization: String,
-        @Path("feed_id")feed_id: String?,
-    ): Call<feed>
-    @PATCH("feed/{feed_id}/minusllike")
-    fun getMinusLikeFeed(
-        @Header("Authorization")authorization: String,
-        @Path("feed_id")feed_id: String?,
-    ): Call<feed>
+    ): Call<BaseResponseList<feedData>>
+
     @GET("feed/{feed_id}/comment")
     fun getFeedComment(
-        @Header("Authorization")authorization: String,
         @Path("feed_id")feed_id: String?,
-    ): Call<feedComment>
+    ): Call<BaseResponseList<feedCommentData>>
+    @GET("feed/{feed_id}/comment/{comment_id}")
+    fun getFeedCommentID(
+        @Path("feed_id")feed_id: String?,
+        @Path("comment_id")comment_id: String?,
+    ): Call<BaseResponseList<feedCommentData>>
     @FormUrlEncoded
     @POST("feed/{feed_id}/comment")
     fun getCreateFeedComment(
-        @Header("Authorization")authorization: String,
         @Path("feed_id")feed_id: String?,
         @Field("description")description: String
-    ): Call<feedComment>
+    ): Call<BaseResponse<createFeedDataComment>>
     @FormUrlEncoded
     @PATCH("feed/{feed_id}/comment/{comment_id}")
     fun getUpdateFeedComment(
-        @Header("Authorization")authorization: String,
         @Path("feed_id")feed_id: String?,
         @Path("comment_id")comment_id: String?,
         @Field("description")description: String,
-    ): Call<feedComment>
+    ): Call<BaseResponse<createFeedDataComment>>
     @DELETE("feed/{feed_id}/comment/{comment_id}")
     fun getDeleteFeedComment(
-        @Header("Authorization")authorization: String,
         @Path("feed_id")feed_id: String?,
-        @Path("comment_id")comment_id: String?): Call<feedComment>
+        @Path("comment_id")comment_id: String?): Call<BaseResponse<createFeedDataComment>>
     @FormUrlEncoded
     @POST("feed")
     fun getCreateFeed(
-        @Header("Authorization")authorization: String,
         @Field("description")description: String,
         @Field("attachments")attachments: ArrayList<String>,
-    ): Call<feed>
+    ): Call<BaseResponse<createFeedData>>
+    @FormUrlEncoded
+    @PATCH("feed/{feed_id}")
+    fun getUpdateFeed(
+        @Path("feed_id")feed_id: String?,
+        @Field("description")description: String,
+        @Field("attachments")attachments: ArrayList<String>,
+    ): Call<BaseResponse<createFeedData>>
 }
