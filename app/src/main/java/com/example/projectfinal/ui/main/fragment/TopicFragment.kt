@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
 import com.example.projectfinal.model.topic.TopicData
@@ -31,7 +32,7 @@ import kotlinx.android.synthetic.main.fragment_topic.*
 @Suppress("DEPRECATION")
 class TopicFragment : Fragment() {
     private lateinit var topicViewModel: TopicViewModel
-    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var layoutManager: GridLayoutManager
     private lateinit var adapter: TopicAdapter
     private var roleGroup: Int? = 0
     private var isUpdate: Int? = 0
@@ -207,7 +208,7 @@ class TopicFragment : Fragment() {
         tv_token_topic.invisible()
         progressBar_topic.visible()
         tv_error_Topic.invisible()
-        layoutManager = LinearLayoutManager(context)
+        layoutManager = GridLayoutManager(context,2)
         recyclerViewTopic.setHasFixedSize(true)
         recyclerViewTopic.layoutManager = layoutManager
         adapter = TopicAdapter { select, position, item ->

@@ -14,7 +14,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.projectfinal.R
 import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.ui.auth.AuthActivity
@@ -29,7 +31,7 @@ import kotlinx.android.synthetic.main.fragment_post.*
 @Suppress("DEPRECATION", "NAME_SHADOWING")
 class PostFragment : Fragment() {
     private lateinit var postViewModel: PostViewModel
-    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var layoutManager: StaggeredGridLayoutManager
     private lateinit var adapter: PostAdapter
     private var roleTopic: Int? = 0
     private var position: Int? = 0
@@ -200,7 +202,7 @@ class PostFragment : Fragment() {
         tv_token_post.invisible()
         progressBar_Post.visible()
         tv_error_Post.invisible()
-        layoutManager = LinearLayoutManager(context)
+        layoutManager = StaggeredGridLayoutManager(2,LinearLayoutManager.VERTICAL)
         recyclerViewPost.setHasFixedSize(true)
         recyclerViewPost.layoutManager = layoutManager
         adapter = PostAdapter { select, position, item ->

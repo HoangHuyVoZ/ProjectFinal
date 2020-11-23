@@ -1,6 +1,7 @@
 package com.example.projectfinal.ui.feed.adapter
 
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ class FeedAdapter(private var onClick: (select: Int, position: Int, item: FeedDa
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        @SuppressLint("SetTextI18n")
         fun bind(list: FeedData) {
             val pref = itemView.context.getSharedPreferences(
                 PREFS_NAME,
@@ -115,7 +117,7 @@ class FeedAdapter(private var onClick: (select: Int, position: Int, item: FeedDa
                     itemView.image1_layout3.visible()
                     itemView.image2_layout3.visible()
                     itemView.tv_count_image.visible()
-                    itemView.tv_count_image.text = "${list.attachments.size - 3}"
+                    itemView.tv_count_image.text = "+${list.attachments.size - 3}"
                     Glide.with(itemView)
                         .load(list.attachments[0])
                         .into(itemView.image_layout2)

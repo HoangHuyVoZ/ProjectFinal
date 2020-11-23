@@ -1,85 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="180dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
     app:cardCornerRadius="15dp"
-    app:cardElevation="8dp"
-    android:layout_margin="10dp">
+    app:cardElevation="8dp">
+
     <com.chauthai.swipereveallayout.SwipeRevealLayout
+        android:id="@+id/swipeLayout_topic"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/swipeLayout_topic"
         app:dragEdge="right"
-        app:mode="same_level"
-        >
-    <RelativeLayout
-        android:layout_width="100dp"
-        android:layout_height="120dp"
-        >
+        app:mode="same_level">
 
-        <TextView
-            android:id="@+id/txtEdit_topic"
-            android:layout_width="50dp"
-            android:layout_height="120dp"
-            android:text="Edit"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:fontFamily="@font/noirpro_medium"
-            android:textColor="#FFF"
-            android:background="@color/colorPrimary"/>
-
-        <TextView
-            android:id="@+id/txtDelete_topic"
-            android:layout_width="50dp"
-            android:layout_height="120dp"
-            android:text="Delete"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:fontFamily="@font/noirpro_medium"
-            android:textColor="#FFF"
-            android:layout_toRightOf="@id/txtEdit_topic"
-            android:background="#F44336"/>
-        <TextView
-            android:id="@+id/txtDelete_topic_admin"
+        <RelativeLayout
             android:layout_width="100dp"
-            android:layout_height="120dp"
-            android:text="Delete"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:fontFamily="@font/noirpro_medium"
-            android:textColor="#FFF"
-            android:background="#F44336"/>
-    </RelativeLayout>
+            android:layout_height="120dp">
+
+            <TextView
+                android:id="@+id/txtEdit_topic"
+                android:layout_width="50dp"
+                android:layout_height="120dp"
+                android:background="@color/colorPrimary"
+                android:fontFamily="@font/noirpro_medium"
+                android:gravity="center"
+                android:text="Edit"
+                android:textAlignment="center"
+                android:textColor="#FFF" />
+
+            <TextView
+                android:id="@+id/txtDelete_topic"
+                android:layout_width="50dp"
+                android:layout_height="120dp"
+                android:layout_toEndOf="@id/txtEdit_topic"
+                android:background="#F44336"
+                android:fontFamily="@font/noirpro_medium"
+                android:gravity="center"
+                android:text="Delete"
+                android:textAlignment="center"
+                android:textColor="#FFF" />
+
+            <TextView
+                android:id="@+id/txtDelete_topic_admin"
+                android:layout_width="100dp"
+                android:layout_height="120dp"
+                android:background="#F44336"
+                android:fontFamily="@font/noirpro_medium"
+                android:gravity="center"
+                android:text="@string/delete"
+                android:textAlignment="center"
+                android:textColor="#FFF" />
+        </RelativeLayout>
+
         <RelativeLayout
             android:id="@+id/topic_rela"
-            android:background="#F9F9F9"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
+            android:background="#F9F9F9">
+
             <TextView
                 android:id="@+id/item_topic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#000"
-                android:fontFamily="@font/noirpro_bold"
-                android:text="topic"
-                android:textSize="22dp"
                 android:layout_marginTop="10dp"
+                android:fontFamily="@font/noirpro_bold"
                 android:paddingLeft="15dp"
-                android:paddingRight="15dp"/>
+                android:paddingRight="15dp"
+                android:text="topic"
+                android:textColor="#000"
+                android:textSize="22dp" />
+
             <TextView
                 android:id="@+id/item_des_top"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#000"
-                android:fontFamily="@font/noirpro_medium"
                 android:layout_below="@id/item_topic"
-                android:text="topic"
-                android:textSize="15dp"
                 android:layout_marginTop="5dp"
+                android:fontFamily="@font/noirpro_medium"
                 android:paddingLeft="15dp"
-                android:paddingRight="15dp"/>
+                android:paddingRight="15dp"
+                android:text="topic"
+                android:textColor="#000"
+                android:textSize="15dp" />
         </RelativeLayout>
     </com.chauthai.swipereveallayout.SwipeRevealLayout>
 </androidx.cardview.widget.CardView>
