@@ -6,19 +6,18 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
-import com.example.projectfinal.model.comment.commentData
-import com.example.projectfinal.model.feed.feedCommentData
+import com.example.projectfinal.model.feed.FeedCommentData
 import com.example.projectfinal.utils.*
 
 import kotlinx.android.synthetic.main.item_comment.view.*
 
-class FeedCommentAdapter(private var onClick: (select: Int, position: Int, item: feedCommentData) -> Unit) :
+class FeedCommentAdapter(private var onClick: (select: Int, position: Int, item: FeedCommentData) -> Unit) :
     RecyclerView.Adapter<FeedCommentAdapter.ViewHolder>() {
-    private var list = ArrayList<feedCommentData>()
+    private var list = ArrayList<FeedCommentData>()
 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(list: feedCommentData) {
+        fun bind(list: FeedCommentData) {
             itemView.tv_username.text = list.createdBy
             itemView.tv_des_comment.text = list.description
             itemView.tv_count_like.text = list.countLike.toString()
@@ -51,7 +50,7 @@ class FeedCommentAdapter(private var onClick: (select: Int, position: Int, item:
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): FeedCommentAdapter.ViewHolder {
+    ): ViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(
             R.layout.item_comment,
             parent,
@@ -61,7 +60,7 @@ class FeedCommentAdapter(private var onClick: (select: Int, position: Int, item:
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: FeedCommentAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
         holder.itemView.txtEdit.setOnClickListener {
@@ -85,24 +84,24 @@ class FeedCommentAdapter(private var onClick: (select: Int, position: Int, item:
         notifyItemRemoved(position)
     }
 
-    fun addList(items: MutableList<feedCommentData>) {
+    fun addList(items: MutableList<FeedCommentData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
 
-    fun getList(): ArrayList<feedCommentData> {
+    fun getList(): ArrayList<FeedCommentData> {
         return list
     }
 
-    fun addItem(item: feedCommentData) {
+    fun addItem(item: FeedCommentData) {
         list.add(0, item)
 //        notifyItemInserted(0)
         notifyDataSetChanged()
 
     }
 
-    fun updateItem(item: feedCommentData, position: Int) {
+    fun updateItem(item: FeedCommentData, position: Int) {
         list[position] = item
         notifyDataSetChanged()
     }

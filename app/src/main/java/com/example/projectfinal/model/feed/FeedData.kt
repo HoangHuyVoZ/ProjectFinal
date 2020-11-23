@@ -7,7 +7,7 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
 @SuppressLint("ParcelCreator")
-data class feedData(
+data class FeedData(
     val attachments: List<String>,
     val avatar: String,
     val countCommentFeed: Int,

@@ -1,25 +1,18 @@
 package com.example.projectfinal.viewmodel
 
-import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectfinal.api.CallApi
 import com.example.projectfinal.model.BaseResponse
 import com.example.projectfinal.model.BaseResponseList
-import com.example.projectfinal.model.feed.createFeedData
-import com.example.projectfinal.model.feed.createFeedDataComment
-import com.example.projectfinal.model.feed.feedCommentData
-import com.example.projectfinal.model.feed.feedData
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
+import com.example.projectfinal.model.feed.CreateFeedData
+import com.example.projectfinal.model.feed.CreateFeedDataComment
+import com.example.projectfinal.model.feed.FeedCommentData
+import com.example.projectfinal.model.feed.FeedData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
-import kotlin.collections.ArrayList
 
 //    var dataFeedLiveData : LiveData<feed> = Transformations.switchMap(dataFeed) {
 //        val data = MutableLiveData<feed>()
@@ -29,30 +22,29 @@ import kotlin.collections.ArrayList
 class FeedViewModel : ViewModel() {
     private val compositeDisposable = CompositeDisposable()
     private val apiManager: CallApi by lazy { CallApi() }
-    var dataFeed: MutableLiveData<BaseResponseList<feedData>> =
-        MutableLiveData<BaseResponseList<feedData>>()
-    var dataCreateFeed: MutableLiveData<BaseResponse<createFeedData>> =
-        MutableLiveData<BaseResponse<createFeedData>>()
-    var dataUpdateFeed: MutableLiveData<BaseResponse<createFeedData>> =
-        MutableLiveData<BaseResponse<createFeedData>>()
-    var dataFeedID: MutableLiveData<BaseResponseList<feedData>> =
-        MutableLiveData<BaseResponseList<feedData>>()
+    var dataFeed: MutableLiveData<BaseResponseList<FeedData>> =
+        MutableLiveData<BaseResponseList<FeedData>>()
+    var dataCreateFeed: MutableLiveData<BaseResponse<CreateFeedData>> =
+        MutableLiveData<BaseResponse<CreateFeedData>>()
+    var dataUpdateFeed: MutableLiveData<BaseResponse<CreateFeedData>> =
+        MutableLiveData<BaseResponse<CreateFeedData>>()
+    var dataFeedID: MutableLiveData<BaseResponseList<FeedData>> =
+        MutableLiveData<BaseResponseList<FeedData>>()
     var dataCountFeed: MutableLiveData<Int> = MutableLiveData<Int>()
-    var dataDeleteFeed: MutableLiveData<BaseResponseList<feedData>> =
-        MutableLiveData<BaseResponseList<feedData>>()
+    var dataDeleteFeed: MutableLiveData<BaseResponseList<FeedData>> =
+        MutableLiveData<BaseResponseList<FeedData>>()
 
-    var dataFeedCommentID: MutableLiveData<BaseResponseList<feedCommentData>> =
-        MutableLiveData<BaseResponseList<feedCommentData>>()
-    var dataComment: MutableLiveData<BaseResponseList<feedCommentData>> =
-        MutableLiveData<BaseResponseList<feedCommentData>>()
-    var dataCreateComment: MutableLiveData<BaseResponse<createFeedDataComment>> =
-        MutableLiveData<BaseResponse<createFeedDataComment>>()
-    var dataDeleteComment: MutableLiveData<BaseResponse<createFeedDataComment>> =
-        MutableLiveData<BaseResponse<createFeedDataComment>>()
-    var dataUpdateComment: MutableLiveData<BaseResponse<createFeedDataComment>> =
-        MutableLiveData<BaseResponse<createFeedDataComment>>()
+    var dataFeedCommentID: MutableLiveData<BaseResponseList<FeedCommentData>> =
+        MutableLiveData<BaseResponseList<FeedCommentData>>()
+    var dataComment: MutableLiveData<BaseResponseList<FeedCommentData>> =
+        MutableLiveData<BaseResponseList<FeedCommentData>>()
+    var dataCreateComment: MutableLiveData<BaseResponse<CreateFeedDataComment>> =
+        MutableLiveData<BaseResponse<CreateFeedDataComment>>()
+    var dataDeleteComment: MutableLiveData<BaseResponse<CreateFeedDataComment>> =
+        MutableLiveData<BaseResponse<CreateFeedDataComment>>()
+    var dataUpdateComment: MutableLiveData<BaseResponse<CreateFeedDataComment>> =
+        MutableLiveData<BaseResponse<CreateFeedDataComment>>()
     var dataCountComment: MutableLiveData<Int> = MutableLiveData<Int>()
-    var dataImage: MutableLiveData<ArrayList<String>> = MutableLiveData<ArrayList<String>>()
 
     fun getCreateFeed(description: String, attachments: ArrayList<String>) {
         compositeDisposable.add(
@@ -74,9 +66,10 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
-    fun getUpdateFeed(description: String, attachments: ArrayList<String>,feedId: String) {
+
+    fun getUpdateFeed(description: String, attachments: ArrayList<String>, feedId: String) {
         compositeDisposable.add(
-            apiManager.getUpdateFeed(description,attachments,feedId)
+            apiManager.getUpdateFeed(description, attachments, feedId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -93,6 +86,7 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
+
     fun getDeleteFeed(feedId: String) {
         compositeDisposable.add(
             apiManager.getDeleteFeedID(feedId)
@@ -111,6 +105,7 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
+
     fun getFeed() {
         compositeDisposable.add(
             apiManager.getFeed()
@@ -140,6 +135,7 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
+
     fun getFeedComment(feedId: String) {
         compositeDisposable.add(
             apiManager.getFeedComment(feedId)
@@ -153,9 +149,10 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
-    fun getFeedCommentId(feedId: String,commentId: String) {
+
+    private fun getFeedCommentId(feedId: String, commentId: String) {
         compositeDisposable.add(
-            apiManager.getFeedCommentID(feedId,commentId)
+            apiManager.getFeedCommentID(feedId, commentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -165,6 +162,7 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
+
     fun getCreateFeedComment(feedId: String, description: String) {
         compositeDisposable.add(
             apiManager.getCreateFeedComment(feedId, description)
@@ -174,7 +172,7 @@ class FeedViewModel : ViewModel() {
                     if (it.success) {
                         dataCreateComment.value = it
                         dataCountComment.value = dataCountComment.value?.plus(1)
-                        getFeedCommentId(feedId,it.result.id)
+                        getFeedCommentId(feedId, it.result.id)
                     } else {
                         dataCreateComment.value = it
                     }
@@ -215,7 +213,7 @@ class FeedViewModel : ViewModel() {
                 .subscribe({
                     if (it.success) {
                         dataUpdateComment.value = it
-                        getFeedCommentId(feedId,it.result.id)
+                        getFeedCommentId(feedId, it.result.id)
 
                     } else {
                         dataUpdateComment.value = it
@@ -226,23 +224,5 @@ class FeedViewModel : ViewModel() {
                 })
         )
     }
-    fun getImage(file: Uri){
-        if (file != null) {
-            val fileName = UUID.randomUUID().toString() + ".jpg"
-            val refStorage = FirebaseStorage.getInstance().reference.child("images/$fileName")
 
-            refStorage.putFile(file)
-                .addOnSuccessListener(
-                    OnSuccessListener<UploadTask.TaskSnapshot> { taskSnapshot ->
-                        taskSnapshot.storage.downloadUrl.addOnSuccessListener {
-                            dataImage.value?.add(it.toString())
-                        }
-                    })
-                ?.addOnFailureListener(OnFailureListener { e ->
-                    print(e.message)
-                })
-
-
-        }
-    }
 }

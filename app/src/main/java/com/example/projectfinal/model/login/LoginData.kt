@@ -1,8 +1,6 @@
 package com.example.projectfinal.model.login
 
 
-import com.google.gson.annotations.SerializedName
-
 data class LoginData(
     val accessToken: String,
     val avatar: String,

@@ -3,7 +3,7 @@ package com.example.projectfinal.model.group
 
 import com.google.gson.annotations.SerializedName
 
-data class Groupdata(
+data class GroupData(
     val createdAt: String,
     val createdBy: String,
     @SerializedName("_id")

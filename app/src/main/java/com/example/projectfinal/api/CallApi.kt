@@ -3,13 +3,13 @@ package com.example.projectfinal.api
 import com.example.projectfinal.model.BaseResponse
 import com.example.projectfinal.model.BaseResponseList
 import com.example.projectfinal.model.comment.CreateCommentData
-import com.example.projectfinal.model.comment.commentData
-import com.example.projectfinal.model.feed.createFeedData
-import com.example.projectfinal.model.feed.createFeedDataComment
-import com.example.projectfinal.model.feed.feedCommentData
-import com.example.projectfinal.model.feed.feedData
+import com.example.projectfinal.model.comment.CommentData
+import com.example.projectfinal.model.feed.CreateFeedData
+import com.example.projectfinal.model.feed.CreateFeedDataComment
+import com.example.projectfinal.model.feed.FeedCommentData
+import com.example.projectfinal.model.feed.FeedData
 import com.example.projectfinal.model.group.CreateGroupData
-import com.example.projectfinal.model.group.Groupdata
+import com.example.projectfinal.model.group.GroupData
 import com.example.projectfinal.model.group.UpdateGroupData
 import com.example.projectfinal.model.login.LoginData
 import com.example.projectfinal.model.post.CreatePostData
@@ -52,13 +52,13 @@ class CallApi {
     }
 
     //group
-    fun getGroups(): Single<BaseResponseList<Groupdata>> {
+    fun getGroups(): Single<BaseResponseList<GroupData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getGroups()
         )
     }
 
-    fun getGroupId(groupId: String): Single<BaseResponseList<Groupdata>> {
+    fun getGroupId(groupId: String): Single<BaseResponseList<GroupData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getGroupId(
                 groupId
@@ -77,14 +77,14 @@ class CallApi {
     }
 
     fun getUpdateGroup(
-        groupId: String,name: String,
+        groupId: String, name: String,
     ): Single<BaseResponse<UpdateGroupData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getUpdateGroup(groupId,name)
+            _apiRestFull.getUpdateGroup(groupId, name)
         )
     }
 
-    fun getDeleteGroup(groupId: String): Single<BaseResponse<CreateGroupData>>{
+    fun getDeleteGroup(groupId: String): Single<BaseResponse<CreateGroupData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getDeleteGroup(groupId)
         )
@@ -102,7 +102,7 @@ class CallApi {
     }
 
     fun getTopicId(
-       groupId: String, topicId: String
+        groupId: String, topicId: String
     ): Single<BaseResponseList<TopicData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getTopic(
@@ -183,13 +183,13 @@ class CallApi {
     }
 
     fun getUpdatePost(
-        groupId: String,topicId: String,postId: String,
+        groupId: String, topicId: String, postId: String,
         title: String,
         description: String
     ): Single<BaseResponse<CreatePostData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUpdatePost(
-              groupId, topicId,
+                groupId, topicId,
                 postId,
                 title,
                 description
@@ -198,33 +198,34 @@ class CallApi {
     }
 
     fun getDeletePost(
-        groupId: String,topicId: String,postId: String,
-        ): Single<BaseResponse<CreatePostData>> {
+        groupId: String, topicId: String, postId: String,
+    ): Single<BaseResponse<CreatePostData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getDeletePost( groupId, topicId, postId)
+            _apiRestFull.getDeletePost(groupId, topicId, postId)
         )
     }
 
     //comment
-    fun getPostId(groupId: String,topicId: String,postId: String,
+    fun getPostId(
+        groupId: String, topicId: String, postId: String,
     ): Single<BaseResponseList<PostData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getPostId( groupId, topicId, postId)
+            _apiRestFull.getPostId(groupId, topicId, postId)
         )
     }
 
     fun getComment(
-        groupId: String,topicId: String,postId: String,
-        ): Single<BaseResponseList<commentData>> {
+        groupId: String, topicId: String, postId: String,
+    ): Single<BaseResponseList<CommentData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getComment(groupId, topicId, postId)
         )
     }
 
     fun getCommentId(
-        groupId: String,topicId: String,postId: String,
+        groupId: String, topicId: String, postId: String,
         commentId: String
-    ): Single<BaseResponseList<commentData>> {
+    ): Single<BaseResponseList<CommentData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCommentId(
                 groupId, topicId, postId,
@@ -234,25 +235,25 @@ class CallApi {
     }
 
     fun getCreateComment(
-        groupId: String,topicId: String,postId: String,
+        groupId: String, topicId: String, postId: String,
         description: String
     ): Single<BaseResponse<CreateCommentData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCreateComment(
-                 groupId, topicId, postId,
+                groupId, topicId, postId,
                 description
             )
         )
     }
 
     fun getUpdateComment(
-        groupId: String,topicId: String,postId: String,
+        groupId: String, topicId: String, postId: String,
         commentId: String,
         description: String,
     ): Single<BaseResponse<CreateCommentData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUpdateComment(
-                 groupId, topicId, postId,
+                groupId, topicId, postId,
                 commentId,
                 description
             )
@@ -260,57 +261,62 @@ class CallApi {
     }
 
     fun getDeleteComment(
-        groupId: String,topicId: String,postId: String,commentId: String
-        ): Single<BaseResponse<CreateCommentData>> {
+        groupId: String, topicId: String, postId: String, commentId: String
+    ): Single<BaseResponse<CreateCommentData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getDeleteComment(
-                 groupId, topicId, postId, commentId
+                groupId, topicId, postId, commentId
             )
         )
     }
 
     //feed
-    fun getFeed(): Single<BaseResponseList<feedData>> {
+    fun getFeed(): Single<BaseResponseList<FeedData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getFeed()
         )
     }
 
-    fun getFeedID(feedId:String): Single<BaseResponseList<feedData>> {
+    fun getFeedID(feedId: String): Single<BaseResponseList<FeedData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getFeedID( feedId)
+            _apiRestFull.getFeedID(feedId)
         )
     }
 
-    fun getDeleteFeedID(feedId:String): Single<BaseResponseList<feedData>> {
+    fun getDeleteFeedID(feedId: String): Single<BaseResponseList<FeedData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getDeleteFeedID( feedId)
+            _apiRestFull.getDeleteFeedID(feedId)
         )
     }
 
-    fun getFeedComment(feedId:String): Single<BaseResponseList<feedCommentData>> {
+    fun getFeedComment(feedId: String): Single<BaseResponseList<FeedCommentData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getFeedComment( feedId)
+            _apiRestFull.getFeedComment(feedId)
         )
     }
-    fun getFeedCommentID(feedId:String,commentId: String): Single<BaseResponseList<feedCommentData>> {
+
+    fun getFeedCommentID(
+        feedId: String,
+        commentId: String
+    ): Single<BaseResponseList<FeedCommentData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getFeedCommentID(feedId,commentId)
+            _apiRestFull.getFeedCommentID(feedId, commentId)
         )
     }
 
     fun getCreateFeedComment(
-        feedId:String,
+        feedId: String,
         description: String
-    ): Single<BaseResponse<createFeedDataComment>> {
+    ): Single<BaseResponse<CreateFeedDataComment>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCreateFeedComment(feedId, description)
         )
     }
 
-    fun getUpdateFeedComment(feedId:String,commentId: String,
+    fun getUpdateFeedComment(
+        feedId: String, commentId: String,
         description: String,
-    ): Single<BaseResponse<createFeedDataComment>> {
+    ): Single<BaseResponse<CreateFeedDataComment>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getUpdateFeedComment(
                 feedId, commentId,
@@ -321,28 +327,29 @@ class CallApi {
     }
 
     fun getDeleteFeedComment(
-        feedId:String,commentId: String,
-    ): Single<BaseResponse<createFeedDataComment>> {
+        feedId: String, commentId: String,
+    ): Single<BaseResponse<CreateFeedDataComment>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getDeleteFeedComment( feedId, commentId)
+            _apiRestFull.getDeleteFeedComment(feedId, commentId)
         )
     }
 
     fun getCreateFeed(
         description: String,
         attachments: ArrayList<String>
-    ): Single<BaseResponse<createFeedData>> {
+    ): Single<BaseResponse<CreateFeedData>> {
         return RetrofitInstants.buildRequest(
             _apiRestFull.getCreateFeed(description, attachments)
         )
     }
+
     fun getUpdateFeed(
         description: String,
         attachments: ArrayList<String>,
         feedId: String
-    ): Single<BaseResponse<createFeedData>> {
+    ): Single<BaseResponse<CreateFeedData>> {
         return RetrofitInstants.buildRequest(
-            _apiRestFull.getUpdateFeed(feedId,description, attachments)
+            _apiRestFull.getUpdateFeed(feedId, description, attachments)
         )
     }
 }

@@ -1,11 +1,7 @@
 package com.example.projectfinal.api
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.example.projectfinal.utils.*
+import com.example.projectfinal.utils.BASE_URL
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,7 +18,6 @@ class RetrofitInstants {
 
     companion object {
         private var retrofit: Retrofit? = null
-        private var context: Context?= null
 
 
         private val logging = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {

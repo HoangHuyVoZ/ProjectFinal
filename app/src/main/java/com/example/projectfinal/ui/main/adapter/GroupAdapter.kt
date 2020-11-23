@@ -1,25 +1,26 @@
 package com.example.projectfinal.ui.main.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
-import com.example.projectfinal.model.group.Groupdata
+import com.example.projectfinal.model.group.GroupData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_group.view.*
-import kotlinx.coroutines.selects.select
 
 class GroupAdapter(
-    private var onClick: (select: Int, position: Int, item: Groupdata) -> Unit
+    private var onClick: (select: Int, position: Int, item: GroupData) -> Unit
 ) :
     RecyclerView.Adapter<GroupAdapter.ViewHolder>() {
-    private var list = ArrayList<Groupdata>()
+    private var list = ArrayList<GroupData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(list: Groupdata) {
+        @SuppressLint("SetTextI18n")
+        fun bind(list: GroupData) {
             itemView.item_create_group.text = "Created by: ${list.createdBy}"
             itemView.item_group.text = list.name
             itemView.swipelayout.close(true)
@@ -56,22 +57,17 @@ class GroupAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-        val id = element.id
-        val name = element.name
+
         holder.itemView.txtEdit.setOnClickListener {
-//            onClickItem.onClickItem(id, 3, name, "", position)
             onClick.invoke(1, position, element)
         }
         holder.itemView.txtDelete.setOnClickListener {
-//            onClickItem.onRemoveClick(position, id)
             onClick.invoke(2, position, element)
         }
         holder.itemView.txtEdit_mod.setOnClickListener {
-//            onClickItem.onClickItem(id, 3, name, "", position)
             onClick.invoke(1, position, element)
         }
         holder.itemView.item_group_re.setOnClickListener {
-//            onClickItem.onClickItem(id, 4, name, "", position)
             onClick.invoke(3, position, element)
         }
     }
@@ -85,22 +81,22 @@ class GroupAdapter(
         notifyDataSetChanged()
     }
 
-    fun addList(items: MutableList<Groupdata>) {
+    fun addList(items: MutableList<GroupData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
 
-    fun getList(): ArrayList<Groupdata> {
+    fun getList(): ArrayList<GroupData> {
         return list
     }
 
-    fun addItem(item: Groupdata) {
+    fun addItem(item: GroupData) {
         list.add(0, item)
         notifyItemInserted(0)
     }
 
-    fun updateItem(item: Groupdata, position: Int) {
+    fun updateItem(item: GroupData, position: Int) {
         list[position] = item
         notifyItemChanged(position)
     }

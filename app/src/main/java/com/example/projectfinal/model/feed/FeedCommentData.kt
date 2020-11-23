@@ -3,7 +3,7 @@ package com.example.projectfinal.model.feed
 
 import com.google.gson.annotations.SerializedName
 
-data class feedCommentData(
+data class FeedCommentData(
     val avatar: String,
     val countLike: Int,
     val createdAt: String,

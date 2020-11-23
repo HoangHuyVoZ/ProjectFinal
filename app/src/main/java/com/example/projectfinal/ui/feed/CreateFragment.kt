@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
-import com.example.projectfinal.model.feed.feedData
+import com.example.projectfinal.model.feed.FeedData
 import com.example.projectfinal.ui.feed.adapter.FeedCreateAdapter
 import com.example.projectfinal.ui.main.HomeActivity
 import com.example.projectfinal.utils.hideBottomNav
@@ -35,7 +35,7 @@ class CreateFragment : Fragment() {
     private lateinit var adapter: FeedCreateAdapter
     private var imageUri: ArrayList<Uri>? = null
     private var update: String? = ""
-    private var feed: feedData? = null
+    private var feed: FeedData? = null
     private var image: ArrayList<String>? = arrayListOf()
 
     private val feedViewModel: FeedViewModel by lazy {
@@ -76,6 +76,7 @@ class CreateFragment : Fragment() {
                     FancyToast.SUCCESS,
                     false
                 ).show()
+                findNavController().popBackStack()
             } else {
                 FancyToast.makeText(
                     context,
@@ -100,6 +101,7 @@ class CreateFragment : Fragment() {
                         FancyToast.SUCCESS,
                         false
                     ).show()
+                    findNavController().popBackStack()
                 } else {
                     FancyToast.makeText(
                         context,
@@ -206,7 +208,6 @@ class CreateFragment : Fragment() {
                         }
                     }
                 }
-
                 .addOnFailureListener { e ->
                     print(e.message)
                 }

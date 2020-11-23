@@ -1,29 +1,33 @@
 package com.example.projectfinal.ui.feed
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
-import com.example.projectfinal.model.feed.feedData
+import com.example.projectfinal.model.feed.FeedData
 import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.feed.adapter.FeedAdapter
 import com.example.projectfinal.ui.main.HomeActivity
-import com.example.projectfinal.utils.*
+import com.example.projectfinal.utils.firstTime
+import com.example.projectfinal.utils.hideBottomNav
+import com.example.projectfinal.utils.invisible
+import com.example.projectfinal.utils.visible
 import com.example.projectfinal.viewmodel.FeedViewModel
 import kotlinx.android.synthetic.main.fragment_feed.*
-import kotlinx.android.synthetic.main.fragment_feed.tv_token
 
 
+@Suppress("NAME_SHADOWING")
 class FeedFragment : Fragment() {
-    lateinit var feedViewModel: FeedViewModel
+    private lateinit var feedViewModel: FeedViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: FeedAdapter
     private var position: Int? = 0
@@ -65,20 +69,20 @@ class FeedFragment : Fragment() {
                     builder.setPositiveButton(android.R.string.yes) { dialog, which ->
                         feedViewModel.getDeleteFeed(idFeed ?: "")
                     }
-                    builder.setNegativeButton(android.R.string.no) { dialog, which ->
+                    builder.setNegativeButton(android.R.string.no) { dialog, _which ->
                         dialog.dismiss()
                     }
                     builder.show()
                 }
                 3 -> {
-                    var bundle = bundleOf("id" to item.id)
+                    val bundle = bundleOf("id" to item.id)
                     findNavController().navigate(
                         R.id.action_feedFragment_to_feedDetailsFragment,
                         bundle
                     )
                 }
                 else -> {
-                    var bundle = Bundle()
+                    val bundle = Bundle()
                     bundle.putParcelable("feed", item)
                     bundle.putString("update", "update")
 
@@ -92,12 +96,13 @@ class FeedFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun dataFeed() {
         feedViewModel.dataDeleteFeed.observe(viewLifecycleOwner, {
             it.let {
                 if (it.success) {
                     adapter.remove(position ?: 0)
-                    position=0
+                    position = 0
                 }
             }
         })
@@ -108,7 +113,7 @@ class FeedFragment : Fragment() {
             if (it != null) {
                 if (it.success) {
                     progressBar.invisible()
-                    adapter.addList(it.result as MutableList<feedData>)
+                    adapter.addList(it.result as MutableList<FeedData>)
                 } else {
                     tv_error.visible()
                     tv_error.text = it.message

@@ -15,21 +15,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectfinal.R
-import com.example.projectfinal.model.comment.commentData
+import com.example.projectfinal.model.comment.CommentData
 import com.example.projectfinal.ui.main.adapter.CommentAdapter
-import com.example.projectfinal.utils.*
-import com.example.projectfinal.viewmodel.MainViewModel
+import com.example.projectfinal.utils.CommentDiffUtilCallback
+import com.example.projectfinal.utils.hideKeyboard
+import com.example.projectfinal.utils.invisible
+import com.example.projectfinal.utils.visible
+import com.example.projectfinal.viewmodel.CommentViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.create_group_dialog.view.*
 import kotlinx.android.synthetic.main.create_topic_dialog.view.*
-import kotlinx.android.synthetic.main.fragment_feed_details.*
 import kotlinx.android.synthetic.main.fragment_post_detail.*
-import kotlinx.android.synthetic.main.fragment_post_detail.btnSend
-import kotlinx.android.synthetic.main.fragment_post_detail.edt_comment
 
 
 class PostDetailFragment : Fragment() {
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var commentViewModel: CommentViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: CommentAdapter
     private var roleComment: Int? = 0
@@ -46,7 +46,7 @@ class PostDetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        commentViewModel = ViewModelProvider(this).get(CommentViewModel::class.java)
         return inflater.inflate(R.layout.fragment_post_detail, container, false)
     }
 
@@ -64,7 +64,7 @@ class PostDetailFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun postIdData() {
-        mainViewModel.postIdData.observe(viewLifecycleOwner, {
+        commentViewModel.postIdData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     tv_profile_comment.text = it.result[0].createdBy
@@ -81,20 +81,20 @@ class PostDetailFragment : Fragment() {
                 }
             }
         })
-        mainViewModel.countCommentData.observe(viewLifecycleOwner, {
+        commentViewModel.countCommentData.observe(viewLifecycleOwner, {
             tv_comment_count.text = "$it Comment"
 
         })
-        mainViewModel.commentData.observe(viewLifecycleOwner, {
+        commentViewModel.commentData.observe(viewLifecycleOwner, {
             if (it != null) {
 
                 val diffUtilCallback = CommentDiffUtilCallback(adapter.getList(), it.result)
                 val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
-                adapter.addList(it.result as MutableList<commentData>)
+                adapter.addList(it.result as MutableList<CommentData>)
                 diffResult.dispatchUpdatesTo(adapter)
             }
         })
-        mainViewModel.commentIdData.observe(viewLifecycleOwner, {
+        commentViewModel.commentIdData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.success) {
                     mAlertDialog?.dismiss()
@@ -109,7 +109,7 @@ class PostDetailFragment : Fragment() {
                 }
             }
         })
-        mainViewModel.createComment.observe(viewLifecycleOwner, {
+        commentViewModel.createComment.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     isUpdate = 1
@@ -126,7 +126,7 @@ class PostDetailFragment : Fragment() {
             }
 
         })
-        mainViewModel.updateComment.observe(viewLifecycleOwner, {
+        commentViewModel.updateComment.observe(viewLifecycleOwner, {
             it.let {
                 if (it.success) {
                     isUpdate = 2
@@ -142,7 +142,7 @@ class PostDetailFragment : Fragment() {
                 }
             }
         })
-        mainViewModel.deleteComment.observe(viewLifecycleOwner,
+        commentViewModel.deleteComment.observe(viewLifecycleOwner,
             {
                 it.let {
                     if (it.success) {
@@ -181,7 +181,7 @@ class PostDetailFragment : Fragment() {
                     builder.setTitle("Warning !!!")
                     builder.setMessage("Do you want remove this Comment?")
                     builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-                        mainViewModel.getDeleteComment(
+                        commentViewModel.getDeleteComment(
                             idGroup ?: "",
                             idTopic ?: "",
                             idPost ?: "",
@@ -208,7 +208,7 @@ class PostDetailFragment : Fragment() {
         btnSend.setOnClickListener {
             if (edt_comment.text.toString().length >= 3) {
                 it.hideKeyboard()
-                mainViewModel.getCreateComment(
+                commentViewModel.getCreateComment(
                     idGroup ?: "", idTopic ?: "", idPost ?: "",
                     edt_comment.text.toString()
                 )
@@ -222,8 +222,8 @@ class PostDetailFragment : Fragment() {
     }
 
     private fun getPostID() {
-        mainViewModel.getPostId(idGroup ?: "", idTopic ?: "", idPost ?: "")
-        mainViewModel.getComment(idGroup ?: "", idTopic ?: "", idPost ?: "")
+        commentViewModel.getPostId(idGroup ?: "", idTopic ?: "", idPost ?: "")
+        commentViewModel.getComment(idGroup ?: "", idTopic ?: "", idPost ?: "")
     }
 
 
@@ -251,7 +251,7 @@ class PostDetailFragment : Fragment() {
                     dialog.edt_des_topic.error = "You have not entered a description"
                 }
                 else -> {
-                    mainViewModel.getUpdateComment(
+                    commentViewModel.getUpdateComment(
                         idGroup ?: "", idTopic ?: "", idPost ?: "", idComment ?: "", des ?: ""
                     )
                     mAlertDialog?.dismiss()

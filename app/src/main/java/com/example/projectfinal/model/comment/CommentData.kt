@@ -3,7 +3,7 @@ package com.example.projectfinal.model.comment
 
 import com.google.gson.annotations.SerializedName
 
-data class commentData(
+data class CommentData(
     val countLike: Int,
     val createdAt: String,
     val createdBy: String,

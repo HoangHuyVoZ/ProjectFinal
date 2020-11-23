@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.projectfinal.R
-import com.example.projectfinal.model.feed.ImageData
 import kotlinx.android.synthetic.main.item_image.view.*
 
 class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
@@ -24,7 +23,7 @@ class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): FeedCreateAdapter.ViewHolder {
+    ): ViewHolder {
         val view: View = LayoutInflater.from(parent.context).inflate(
             R.layout.item_image,
             parent,
@@ -34,7 +33,7 @@ class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: FeedCreateAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
 //        onClick.onClickItem("",position,name,"")
@@ -68,7 +67,8 @@ class FeedCreateAdapter : RecyclerView.Adapter<FeedCreateAdapter.ViewHolder>() {
         }
         return checkList
     }
-    fun clear(){
+
+    fun clear() {
         list.clear()
         notifyDataSetChanged()
     }

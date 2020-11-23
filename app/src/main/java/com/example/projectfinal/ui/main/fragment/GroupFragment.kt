@@ -18,20 +18,19 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.projectfinal.R
-import com.example.projectfinal.model.BaseResponse
-import com.example.projectfinal.model.group.CreateGroupData
-import com.example.projectfinal.model.group.Groupdata
+import com.example.projectfinal.model.group.GroupData
 import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.main.adapter.GroupAdapter
 import com.example.projectfinal.utils.*
-import com.example.projectfinal.viewmodel.MainViewModel
+import com.example.projectfinal.viewmodel.GroupViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.create_group_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_group.*
 
 
+@Suppress("NAME_SHADOWING")
 class GroupFragment : Fragment() {
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var groupViewModel: GroupViewModel
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var adapter: GroupAdapter
     private var roleGroup: Int? = 0
@@ -46,7 +45,7 @@ class GroupFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        groupViewModel = ViewModelProvider(this).get(GroupViewModel::class.java)
         return inflater.inflate(R.layout.fragment_group, container, false)
     }
 
@@ -65,16 +64,16 @@ class GroupFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun dataGroup() {
         //getAll
-        mainViewModel.countGroupData.observe(viewLifecycleOwner, {
+        groupViewModel.countGroupData.observe(viewLifecycleOwner, {
             it.let { tv_countGroup.text = "Total: $it group" }
         })
-        mainViewModel.groupData.observe(viewLifecycleOwner, {
+        groupViewModel.groupData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     val list = it.result
                     val diffUtilCallback = GroupDiffUtilCallback(adapter.getList(), list)
                     val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
-                    adapter.addList(list as MutableList<Groupdata>)
+                    adapter.addList(list as MutableList<GroupData>)
                     diffResult.dispatchUpdatesTo(adapter)
                     progressBar3.invisible()
 
@@ -94,7 +93,7 @@ class GroupFragment : Fragment() {
             }
         })
         //Create
-        mainViewModel.createData.observe(viewLifecycleOwner, {
+        groupViewModel.createData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -114,7 +113,7 @@ class GroupFragment : Fragment() {
             }
 
         })
-        mainViewModel.groupDataId.observe(viewLifecycleOwner, {
+        groupViewModel.groupDataId.observe(viewLifecycleOwner, {
             it.let {
                 if (it.success) {
                     mAlertDialog?.dismiss()
@@ -128,7 +127,7 @@ class GroupFragment : Fragment() {
 
         })
         //delete
-        mainViewModel.deleteGroupData.observe(viewLifecycleOwner, {
+        groupViewModel.deleteGroupData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -150,7 +149,7 @@ class GroupFragment : Fragment() {
             }
         })
         //update
-        mainViewModel.updateGroupData.observe(viewLifecycleOwner, {
+        groupViewModel.updateGroupData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -176,7 +175,7 @@ class GroupFragment : Fragment() {
     }
 
     private fun getGroup() {
-        mainViewModel.getGroup()
+        groupViewModel.getGroup()
     }
 
     private fun init() {
@@ -201,7 +200,7 @@ class GroupFragment : Fragment() {
                     builder.setTitle("Warning !!!")
                     builder.setMessage("Do you want remove this group?")
                     builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-                        mainViewModel.getDeleteGroup(groupId ?: "")
+                        groupViewModel.getDeleteGroup(groupId ?: "")
                     }
                     builder.setNegativeButton(android.R.string.no) { dialog, which ->
                         dialog.dismiss()
@@ -253,7 +252,7 @@ class GroupFragment : Fragment() {
                 if (title?.isEmpty()!!) {
                     dialog.edt_title_create.error = "You have not entered a title"
                 } else {
-                    mainViewModel.getCreateData(title ?: "")
+                    groupViewModel.getCreateData(title ?: "")
                 }
             }
         } else {
@@ -268,7 +267,7 @@ class GroupFragment : Fragment() {
                 if (title?.isEmpty()!!) {
                     dialog.edt_title_create.error = "You have not entered a title"
                 } else {
-                    mainViewModel.getUpdateGroup(groupId ?: "", title ?: "")
+                    groupViewModel.getUpdateGroup(groupId ?: "", title ?: "")
 
                 }
             }

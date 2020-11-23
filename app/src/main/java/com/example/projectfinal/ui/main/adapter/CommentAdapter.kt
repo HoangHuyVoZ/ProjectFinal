@@ -7,18 +7,17 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectfinal.R
-import com.example.projectfinal.model.comment.commentData
-import com.example.projectfinal.model.post.PostData
+import com.example.projectfinal.model.comment.CommentData
 import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_comment.view.*
 
-class CommentAdapter(private var onClick: (select: Int, position: Int, item: commentData) -> Unit) :
+class CommentAdapter(private var onClick: (select: Int, position: Int, item: CommentData) -> Unit) :
     RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
-    private var list = ArrayList<commentData>()
+    private var list = ArrayList<CommentData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(list: commentData) {
+        fun bind(list: CommentData) {
             itemView.tv_username.text = list.createdBy
             itemView.swipe.close(true)
 
@@ -82,24 +81,24 @@ class CommentAdapter(private var onClick: (select: Int, position: Int, item: com
         notifyItemRemoved(position)
     }
 
-    fun addList(items: MutableList<commentData>) {
+    fun addList(items: MutableList<CommentData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()
     }
 
-    fun getList(): ArrayList<commentData> {
+    fun getList(): ArrayList<CommentData> {
         return list
     }
 
-    fun addItem(item: commentData) {
+    fun addItem(item: CommentData) {
         list.add(0, item)
 //        notifyItemInserted(0)
         notifyDataSetChanged()
 
     }
 
-    fun updateItem(item: commentData, position: Int) {
+    fun updateItem(item: CommentData, position: Int) {
         list[position] = item
         notifyDataSetChanged()
     }

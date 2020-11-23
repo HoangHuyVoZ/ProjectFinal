@@ -1,25 +1,27 @@
 package com.example.projectfinal.ui.profile
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.projectfinal.R
 import com.example.projectfinal.ui.auth.AuthActivity
-import com.example.projectfinal.utils.*
+import com.example.projectfinal.utils.PREFS_NAME
+import com.example.projectfinal.utils.ROLE
+import com.example.projectfinal.utils.USERNAME
+import com.example.projectfinal.utils.firstTime
 import com.example.projectfinal.viewmodel.AuthViewModel
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 
 @Suppress("NAME_SHADOWING")
 class ProfileFragment : Fragment() {
-    lateinit var authViewModel: AuthViewModel
+    private lateinit var authViewModel: AuthViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,11 +37,11 @@ class ProfileFragment : Fragment() {
             AppCompatActivity.MODE_PRIVATE
         )
 
-        tv_username_pro.text = pref.getString(USERNAME,"")
-        tv_role_pro.text =  pref.getString(ROLE,"")
+        tv_username_pro.text = pref.getString(USERNAME, "")
+        tv_role_pro.text = pref.getString(ROLE, "")
 
         logout.setOnClickListener {
-            context?.let { it -> firstTime(it,true) }
+            context?.let { it -> firstTime(it, true) }
             val intent = Intent(context, AuthActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(intent)

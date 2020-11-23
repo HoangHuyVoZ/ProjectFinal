@@ -1,5 +1,6 @@
 package com.example.projectfinal.ui.main.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,18 +12,19 @@ import com.example.projectfinal.utils.*
 import kotlinx.android.synthetic.main.item_post.view.*
 
 class PostAdapter(
-    private var onClick: (select: Int,position:Int,item:PostData)->Unit
+    private var onClick: (select: Int, position: Int, item: PostData) -> Unit
 ) :
     RecyclerView.Adapter<PostAdapter.ViewHolder>() {
     private var list = ArrayList<PostData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        @SuppressLint("SetTextI18n")
         fun bind(list: PostData) {
             itemView.swipeLayout_post.close(true)
             itemView.item_profile.text = "Created by: ${list.createdBy}"
-            itemView.tv_countComment.text = list.countCommentPost.toString() ?: "0"
-            itemView.tv_countLike.text = list.countLike.toString() ?: "0"
+            itemView.tv_countComment.text = list.countCommentPost.toString()
+            itemView.tv_countLike.text = list.countLike.toString()
             itemView.item_post.text = list.title
             itemView.item_des_post.text = "Description: ${list.description}"
             val pref = itemView.context.getSharedPreferences(
@@ -64,20 +66,18 @@ class PostAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-        val id = element.id
-        val title = element.title
-        val des = element.description
+
         holder.itemView.txtEdit_post.setOnClickListener {
-                onClick.invoke(1,position,element)
+            onClick.invoke(1, position, element)
         }
         holder.itemView.txtDelete_post.setOnClickListener {
-            onClick.invoke(2,position,element)
+            onClick.invoke(2, position, element)
         }
         holder.itemView.txtDelete_post_admin.setOnClickListener {
-            onClick.invoke(2,position,element)
+            onClick.invoke(2, position, element)
         }
         holder.itemView.post_rela.setOnClickListener {
-            onClick.invoke(3,position,element)
+            onClick.invoke(3, position, element)
         }
     }
 

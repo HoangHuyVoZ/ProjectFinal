@@ -21,7 +21,7 @@ import com.example.projectfinal.model.topic.TopicData
 import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.main.adapter.TopicAdapter
 import com.example.projectfinal.utils.*
-import com.example.projectfinal.viewmodel.MainViewModel
+import com.example.projectfinal.viewmodel.TopicViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.create_topic_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_group.*
@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.fragment_topic.*
 
 @Suppress("DEPRECATION")
 class TopicFragment : Fragment() {
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var topicViewModel: TopicViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: TopicAdapter
     private var roleGroup: Int? = 0
@@ -46,7 +46,7 @@ class TopicFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        topicViewModel = ViewModelProvider(this).get(TopicViewModel::class.java)
         return inflater.inflate(R.layout.fragment_topic, container, false)
     }
 
@@ -62,11 +62,11 @@ class TopicFragment : Fragment() {
 
     @SuppressLint("ShowToast", "SetTextI18n")
     private fun data() {
-        mainViewModel.countTopicData.observe(viewLifecycleOwner, {
+        topicViewModel.countTopicData.observe(viewLifecycleOwner, {
             tv_countTopic.text = "Total: $it topic"
 
         })
-        mainViewModel.topicData.observe(viewLifecycleOwner, {
+        topicViewModel.topicData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     val diffUtilCallback = TopicDiffUtilCallback(adapter.getList(), it.result)
@@ -91,7 +91,7 @@ class TopicFragment : Fragment() {
                 progressBar3.invisible()
             }
         })
-        mainViewModel.topicDataId.observe(viewLifecycleOwner, {
+        topicViewModel.topicDataId.observe(viewLifecycleOwner, {
             it.let {
                 if (it.success) {
                     mAlertDialog?.dismiss()
@@ -104,7 +104,7 @@ class TopicFragment : Fragment() {
             }
 
         })
-        mainViewModel.createTopicData.observe(viewLifecycleOwner, {
+        topicViewModel.createTopicData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -131,7 +131,7 @@ class TopicFragment : Fragment() {
                 it.message = null
             }
         })
-        mainViewModel.updateTopicData.observe(viewLifecycleOwner, {
+        topicViewModel.updateTopicData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -157,7 +157,7 @@ class TopicFragment : Fragment() {
                 it.message = null
             }
         })
-        mainViewModel.deleteTopicData.observe(viewLifecycleOwner, {
+        topicViewModel.deleteTopicData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -188,7 +188,7 @@ class TopicFragment : Fragment() {
 
 
     private fun getTopic() {
-        mainViewModel.getTopic(idGroup ?: "")
+        topicViewModel.getTopic(idGroup ?: "")
 
     }
 
@@ -221,7 +221,7 @@ class TopicFragment : Fragment() {
                     builder.setTitle("Warning !!!")
                     builder.setMessage("Do you want remove this Topic?")
                     builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-                        mainViewModel.getDeleteTopic(idGroup ?: "", idTopic ?: "")
+                        topicViewModel.getDeleteTopic(idGroup ?: "", idTopic ?: "")
                     }
                     builder.setNegativeButton(android.R.string.no) { dialog, which ->
                         dialog.dismiss()
@@ -275,7 +275,7 @@ class TopicFragment : Fragment() {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getCreateTopic(title ?: "", des ?: "", idGroup ?: "")
+                        topicViewModel.getCreateTopic(title ?: "", des ?: "", idGroup ?: "")
                     }
                 }
             }
@@ -298,7 +298,7 @@ class TopicFragment : Fragment() {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getUpdateTopic(
+                        topicViewModel.getUpdateTopic(
                             title ?: "",
                             des ?: "",
                             idGroup ?: "",

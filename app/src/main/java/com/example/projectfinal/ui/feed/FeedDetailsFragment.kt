@@ -2,24 +2,19 @@ package com.example.projectfinal.ui.feed
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.projectfinal.R
-import com.example.projectfinal.model.BaseResponse
-import com.example.projectfinal.model.feed.createFeedDataComment
-import com.example.projectfinal.model.feed.feedCommentData
+import com.example.projectfinal.model.feed.FeedCommentData
 import com.example.projectfinal.ui.feed.adapter.FeedCommentAdapter
 import com.example.projectfinal.utils.*
 import com.example.projectfinal.viewmodel.FeedViewModel
@@ -175,7 +170,7 @@ class FeedDetailsFragment : Fragment() {
                     tv_no_comment_feed.invisible()
                     tv_comment_count_feed.visible()
                 }
-                adapter.addList(it.result as MutableList<feedCommentData>)
+                adapter.addList(it.result as MutableList<FeedCommentData>)
 
             }
         })

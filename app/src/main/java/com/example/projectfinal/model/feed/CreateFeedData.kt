@@ -2,7 +2,7 @@ package com.example.projectfinal.model.feed
 
 
 
-data class createFeedData(
+data class CreateFeedData(
     val createdAt: String,
     val createdBy: String,
     val id: String,

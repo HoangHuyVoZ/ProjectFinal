@@ -1,17 +1,17 @@
 package com.example.projectfinal.ui.profile
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.projectfinal.R
-import com.example.projectfinal.utils.*
+import com.example.projectfinal.utils.hideKeyboard
+import com.example.projectfinal.utils.invisible
+import com.example.projectfinal.utils.isPassValid
+import com.example.projectfinal.utils.visible
 import com.example.projectfinal.viewmodel.AuthViewModel
 import kotlinx.android.synthetic.main.fragment_chang_pass.*
 
@@ -33,7 +33,7 @@ class ChangPassFragment : Fragment() {
     }
 
     private fun dataChange() {
-        authViewModel.userChangPass.observe(viewLifecycleOwner, Observer {
+        authViewModel.userChangPass.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     edtOldPass.text.clear()
@@ -61,9 +61,9 @@ class ChangPassFragment : Fragment() {
     }
 
     private fun checkChangePass() {
-        var old = edtOldPass.text.toString()
-        var new = edtNewPass.text.toString()
-        var reNew = edtReNewPass.text.toString()
+        val old = edtOldPass.text.toString()
+        val new = edtNewPass.text.toString()
+        val reNew = edtReNewPass.text.toString()
         if (!isPassValid(old)) {
             edtOldPass.error = "The password must contain 8 characters"
         }
@@ -73,7 +73,7 @@ class ChangPassFragment : Fragment() {
         if (!isPassValid(reNew)) {
             edtReNewPass.error = "The password must contain 8 characters"
         } else if (isPassValid(old) && isPassValid(new) && isPassValid(reNew)) {
-            authViewModel.getUserChangPass( old, new, reNew)
+            authViewModel.getUserChangPass(old, new, reNew)
         }
     }
 

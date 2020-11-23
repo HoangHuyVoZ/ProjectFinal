@@ -9,17 +9,20 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.projectfinal.R
-import com.example.projectfinal.model.feed.feedData
-import com.example.projectfinal.utils.*
+import com.example.projectfinal.model.feed.FeedData
+import com.example.projectfinal.utils.PREFS_NAME
+import com.example.projectfinal.utils.USERNAME_ID
+import com.example.projectfinal.utils.invisible
+import com.example.projectfinal.utils.visible
 import kotlinx.android.synthetic.main.item_feed.view.*
 
-class FeedAdapter(private var onClick: (select: Int, position: Int, item: feedData) -> Unit) :
+class FeedAdapter(private var onClick: (select: Int, position: Int, item: FeedData) -> Unit) :
     RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
-    private var list = ArrayList<feedData>()
+    private var list = ArrayList<FeedData>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(list: feedData) {
+        fun bind(list: FeedData) {
             val pref = itemView.context.getSharedPreferences(
                 PREFS_NAME,
                 AppCompatActivity.MODE_PRIVATE
@@ -112,7 +115,7 @@ class FeedAdapter(private var onClick: (select: Int, position: Int, item: feedDa
                     itemView.image1_layout3.visible()
                     itemView.image2_layout3.visible()
                     itemView.tv_count_image.visible()
-                    itemView.tv_count_image.text = "+ ${list.attachments.size - 3}"
+                    itemView.tv_count_image.text = "${list.attachments.size - 3}"
                     Glide.with(itemView)
                         .load(list.attachments[0])
                         .into(itemView.image_layout2)
@@ -141,19 +144,17 @@ class FeedAdapter(private var onClick: (select: Int, position: Int, item: feedDa
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val element = list[position]
         holder.bind(element)
-        val id = element.id
-        val des = element.description
         holder.itemView.btn_more.setOnClickListener {
-            val popupMenu: PopupMenu = PopupMenu(holder.itemView.context, holder.itemView.btn_more)
+            val popupMenu = PopupMenu(holder.itemView.context, holder.itemView.btn_more)
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+            popupMenu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.Delete -> onClick.invoke(1, position, element)
 
                     R.id.CreateFeedFragment -> onClick.invoke(2, position, element)
                 }
                 true
-            })
+            }
             popupMenu.show()
         }
         holder.itemView.feed.setOnClickListener {
@@ -165,7 +166,7 @@ class FeedAdapter(private var onClick: (select: Int, position: Int, item: feedDa
         return list.size
     }
 
-    fun addList(items: List<feedData>) {
+    fun addList(items: List<FeedData>) {
         list.clear()
         list.addAll(items)
         notifyDataSetChanged()

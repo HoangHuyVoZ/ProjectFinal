@@ -20,7 +20,7 @@ import com.example.projectfinal.model.post.PostData
 import com.example.projectfinal.ui.auth.AuthActivity
 import com.example.projectfinal.ui.main.adapter.PostAdapter
 import com.example.projectfinal.utils.*
-import com.example.projectfinal.viewmodel.MainViewModel
+import com.example.projectfinal.viewmodel.PostViewModel
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.android.synthetic.main.create_topic_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_post.*
@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.fragment_post.*
 
 @Suppress("DEPRECATION", "NAME_SHADOWING")
 class PostFragment : Fragment() {
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var postViewModel: PostViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: PostAdapter
     private var roleTopic: Int? = 0
@@ -45,7 +45,7 @@ class PostFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        postViewModel = ViewModelProvider(this).get(PostViewModel::class.java)
 
         return inflater.inflate(R.layout.fragment_post, container, false)
     }
@@ -63,10 +63,10 @@ class PostFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun dataPost() {
-        mainViewModel.countPostData.observe(viewLifecycleOwner, {
+        postViewModel.countPostData.observe(viewLifecycleOwner, {
             tv_countPost.text = "Total: $it post"
         })
-        mainViewModel.postData.observe(viewLifecycleOwner, {
+        postViewModel.postData.observe(viewLifecycleOwner, {
             if (it != null) {
                 if (it.success) {
                     val diffUtilCallback = PostDiffUtilCallback(adapter.getList(), it.result)
@@ -89,7 +89,7 @@ class PostFragment : Fragment() {
                 progressBar_Post.invisible()
             }
         })
-        mainViewModel.postIdData.observe(viewLifecycleOwner, {
+        postViewModel.postIdData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.success) {
                     mAlertDialog?.dismiss()
@@ -101,7 +101,7 @@ class PostFragment : Fragment() {
                 }
             }
         })
-        mainViewModel.createPostData.observe(viewLifecycleOwner, {
+        postViewModel.createPostData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -131,7 +131,7 @@ class PostFragment : Fragment() {
             }
 
         })
-        mainViewModel.updatePostData.observe(viewLifecycleOwner, {
+        postViewModel.updatePostData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -159,7 +159,7 @@ class PostFragment : Fragment() {
 
 
         })
-        mainViewModel.deletePostData.observe(viewLifecycleOwner, {
+        postViewModel.deletePostData.observe(viewLifecycleOwner, {
             it.let {
                 if (it.message != null) {
                     if (it.success) {
@@ -189,7 +189,7 @@ class PostFragment : Fragment() {
     }
 
     private fun getPost() {
-        mainViewModel.getPost(idGroup ?: "", idTopic ?: "")
+        postViewModel.getPost(idGroup ?: "", idTopic ?: "")
 
     }
 
@@ -214,7 +214,7 @@ class PostFragment : Fragment() {
                     builder.setTitle("Warning !!!")
                     builder.setMessage("Do you want remove this Post?")
                     builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-                        mainViewModel.getDeletePost(idGroup ?: "", idTopic ?: "", idPost ?: "")
+                        postViewModel.getDeletePost(idGroup ?: "", idTopic ?: "", idPost ?: "")
                     }
                     builder.setNegativeButton(android.R.string.no) { dialog, which ->
                         dialog.dismiss()
@@ -277,7 +277,7 @@ class PostFragment : Fragment() {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getCreatePost(
+                        postViewModel.getCreatePost(
                             idGroup ?: "",
                             idTopic ?: "",
                             title ?: "",
@@ -306,7 +306,7 @@ class PostFragment : Fragment() {
                         dialog.edt_des_topic.error = "You have not entered a descripttion"
                     }
                     else -> {
-                        mainViewModel.getUpdatePost(
+                        postViewModel.getUpdatePost(
                             idGroup ?: "", idTopic ?: "", idPost ?: "",
                             title ?: "",
                             des ?: ""
