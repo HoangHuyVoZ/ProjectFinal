@@ -150,8 +150,8 @@ class CreateFragment : Fragment() {
             startActivityForResult(intent, RESULT_LOAD_IMAGE)
         }
         tv_save.setOnClickListener {
-            progressBar.visible()
             it.hideKeyboard()
+            progressBar.visible()
             val edtStatus = edt_status.text.toString()
             val listImage = adapter.getList()
             dataImage(edtStatus, listImage)

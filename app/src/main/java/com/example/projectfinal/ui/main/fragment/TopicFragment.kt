@@ -55,7 +55,9 @@ class TopicFragment : Fragment() {
 
         nameGroup = arguments?.getString("name").toString()
         idGroup = arguments?.getString("group_id").toString()
-
+        swipeRefreshLayoutTopic.setOnRefreshListener {
+            topicViewModel.getTopic(idGroup?:"")
+        }
         init()
         getTopic()
         data()
@@ -75,7 +77,7 @@ class TopicFragment : Fragment() {
                     adapter.addList(it.result as MutableList<TopicData>)
                     diffResult.dispatchUpdatesTo(adapter)
                     progressBar_topic.invisible()
-
+                    swipeRefreshLayoutTopic.isRefreshing =false
 
                 } else {
                     tv_error_Topic.text = it.message

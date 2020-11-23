@@ -67,18 +67,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewTopic"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayoutTopic"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="140dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_countTopic"
-        app:layout_constraintVertical_bias="0.509"
-        tools:listitem="@layout/item_topic" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_countTopic">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewTopic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_topic" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/progressBar_topic"

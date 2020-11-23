@@ -57,7 +57,9 @@ class PostFragment : Fragment() {
         nameTopic = arguments?.getString("name").toString()
         idGroup = arguments?.getString("group_id").toString()
         idTopic = arguments?.getString("topic_id").toString()
-
+        swipeRefreshLayoutPost.setOnRefreshListener {
+            postViewModel.getPost(idGroup?:"",idTopic?:"")
+        }
         init()
         getPost()
         dataPost()
@@ -76,6 +78,7 @@ class PostFragment : Fragment() {
                     adapter.addList(it.result as MutableList<PostData>)
                     diffResult.dispatchUpdatesTo(adapter)
                     progressBar_Post.invisible()
+                    swipeRefreshLayoutPost.isRefreshing = false
                 } else {
                     tv_error_Post.text = it.message
                     tv_error_Post.visible()

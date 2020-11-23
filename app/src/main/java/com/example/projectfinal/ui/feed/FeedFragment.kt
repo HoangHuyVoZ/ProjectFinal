@@ -44,7 +44,9 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         (activity as? HomeActivity)?.hideBottomNav(false)
-
+        swipeRefreshLayoutFeed.setOnRefreshListener {
+            feedViewModel.getFeed()
+        }
         init()
         getFeed()
         dataFeed()
@@ -113,6 +115,7 @@ class FeedFragment : Fragment() {
             if (it != null) {
                 if (it.success) {
                     progressBar.invisible()
+                    swipeRefreshLayoutFeed.isRefreshing= false
                     adapter.addList(it.result as MutableList<FeedData>)
                 } else {
                     tv_error.visible()

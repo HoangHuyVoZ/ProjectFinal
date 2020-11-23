@@ -55,6 +55,9 @@ class GroupFragment : Fragment() {
             AppCompatActivity.MODE_PRIVATE
         )
         role = pref?.getString("ROLE", "")
+        swipeRefreshLayout.setOnRefreshListener {
+            groupViewModel.getGroup()
+        }
         init()
         getGroup()
         dataGroup()
@@ -76,6 +79,7 @@ class GroupFragment : Fragment() {
                     adapter.addList(list as MutableList<GroupData>)
                     diffResult.dispatchUpdatesTo(adapter)
                     progressBar3.invisible()
+                    swipeRefreshLayout.isRefreshing= false
 
                 } else {
                     tv_error_group.visible()
